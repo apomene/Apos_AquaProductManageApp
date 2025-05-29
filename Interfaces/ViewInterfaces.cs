@@ -11,11 +11,8 @@ namespace Apos_AquaProductManageApp.Interfaces
             void DisplayCages(List<Cage> cages);
             void SetPresenter(CagePresenter cagePresenter);
         }
-        public interface IStockingView
-        {
-            void DisplayStockings(List<FishStocking> stockings);
-            void SetPresenter(StockingPresenter stockingPresenter);
-        }
+        public interface IStockingView { void SetPresenter(StockingPresenter presenter); void DisplayAvailableCages(List<Cage> cages); void DisplayStockings(List<FishStocking> stockings); }
+
         public interface IMortalityView
         {
             void SetPresenter(MortalityPresenter presenter);

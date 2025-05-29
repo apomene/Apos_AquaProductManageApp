@@ -1,17 +1,8 @@
-﻿
-using Microsoft.EntityFrameworkCore;
-using Apos_AquaProductManageApp.Model;
+﻿using Apos_AquaProductManageApp.Model;
+
 
 namespace Apos_AquaProductManageApp.DBContext
-{    
-    public class FishFarmDbContext : DbContext
-    {
-        public FishFarmDbContext(DbContextOptions<FishFarmDbContext> options) : base(options) { }
-        public DbSet<Cage> Cages { get; set; }
-        
-
-    }
-
+{
     public class CageService
     {
         private readonly FishFarmDbContext _db;
@@ -31,7 +22,7 @@ namespace Apos_AquaProductManageApp.DBContext
                 return;
             }
             _db.Cages.Add(new Cage { Name = name, IsActive = isActive });
-           _db.SaveChanges();        
+            _db.SaveChanges();
         }
 
 
@@ -58,10 +49,8 @@ namespace Apos_AquaProductManageApp.DBContext
             else
             {
                 MessageBox.Show("Cage not found.");
-            }                     
+            }
         }
 
     }
-
-
 }

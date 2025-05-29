@@ -18,15 +18,16 @@ namespace Apos_AquaProductManageApp
             services.AddDbContext<FishFarmDbContext>(options =>
                 options.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=FishFarmDB;Trusted_Connection=True;TrustServerCertificate=True;"));
             services.AddTransient<CageService>();
+            services.AddTransient<StockingService>();
 
             var provider = services.BuildServiceProvider();
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            var cageForm = new CageForm();
-            var presenter = new CagePresenter(cageForm, provider.GetRequiredService<CageService>());
-            Application.Run(cageForm);
+            var stockingForm = new StockingForm();
+            var presenter = new StockingPresenter(stockingForm, provider.GetRequiredService<StockingService>());
+            Application.Run(stockingForm);
         }
     }
 }
