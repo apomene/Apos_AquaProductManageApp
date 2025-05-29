@@ -9,8 +9,42 @@ namespace Apos_AquaProductManageApp.Presenters
         public class CagePresenter
         {
             private readonly ICageView _view;
-            public CagePresenter(ICageView view) { _view = view; view.SetPresenter(this); }
-            public void LoadCages() { _view.DisplayCages(new List<Cage>()); } // Load from DB in real app
+            private List<Cage> _cages = new();
+            private int _nextId = 3;
+
+            public CagePresenter(ICageView view) { _view = view; view.SetPresenter(this); LoadCages(); }
+
+            public void LoadCages()
+            {
+                _cages = new List<Cage> {
+                new Cage { Id = 1, Name = "Cage A", IsActive = true },
+                new Cage { Id = 2, Name = "Cage B", IsActive = false }
+            };
+                _view.DisplayCages(_cages);
+            }
+
+            public void AddCage(string name, bool isActive)
+            {
+                _cages.Add(new Cage { Id = _nextId++, Name = name, IsActive = isActive });
+                _view.DisplayCages(_cages);
+            }
+
+            public void DeleteCage(int id)
+            {
+                _cages.RemoveAll(c => c.Id == id);
+                _view.DisplayCages(_cages);
+            }
+
+            public void UpdateCage(int id, string name, bool isActive)
+            {
+                var cage = _cages.FirstOrDefault(c => c.Id == id);
+                if (cage != null)
+                {
+                    cage.Name = name;
+                    cage.IsActive = isActive;
+                    _view.DisplayCages(_cages);
+                }
+            }
         }
 
         public class StockingPresenter

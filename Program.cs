@@ -1,3 +1,5 @@
+using static Apos_AquaProductManageApp.Presenters.Presenter;
+
 namespace Apos_AquaProductManageApp
 {
     internal static class Program
@@ -8,10 +10,12 @@ namespace Apos_AquaProductManageApp
         [STAThread]
         static void Main()
         {
-            // To customize application configuration such as set high DPI settings or default font,
-            // see https://aka.ms/applicationconfiguration.
-            ApplicationConfiguration.Initialize();
-            Application.Run(new CageForm());
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+
+            var cageForm = new CageForm();
+            var presenter = new CagePresenter(cageForm);
+            Application.Run(cageForm);
         }
     }
 }
