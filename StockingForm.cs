@@ -23,10 +23,10 @@ namespace Apos_AquaProductManageApp
             dtPicker = new DateTimePicker { Top = 10, Left = 10, Width = 200 };
             dtPicker.ValueChanged += (s, e) => _presenter.LoadStockingData(dtPicker.Value.Date);
 
-            gridAvailable = new DataGridView { Top = 40, Left = 10, Width = 300, Height = 150, AutoGenerateColumns = true };
+            gridAvailable = new DataGridView { Top = 40, Left = 10, Width = 800, Height = 250, AutoGenerateColumns = true };
             gridAvailable.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
 
-            gridStocked = new DataGridView { Top = 200, Left = 10, Width = 300, Height = 150, AutoGenerateColumns = true };
+            gridStocked = new DataGridView { Top = 200, Left = 10, Width = 800, Height = 250, AutoGenerateColumns = true };
 
             numQuantity = new NumericUpDown { Top = 360, Left = 10, Width = 100, Minimum = 1, Maximum = 100000 };
             btnAdd = new Button { Text = "Add Stocking", Top = 360, Left = 120 };

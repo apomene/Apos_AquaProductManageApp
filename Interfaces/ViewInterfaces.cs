@@ -16,12 +16,12 @@ namespace Apos_AquaProductManageApp.Interfaces
         public interface IMortalityView
         {
             void SetPresenter(MortalityPresenter presenter);
-            void DisplayMortalities(List<FishFarmModel.Mortality> mortalities);
+            void DisplayMortalities(List<Mortality> mortalities);
         }
         public interface ITransferView
         {
             void SetPresenter(TransferPresenter presenter);
-            void DisplayTransfers(List<FishFarmModel.Transfer> transfers);
+            void DisplayTransfers(List<FishTransfer> transfers);
         }
         public interface IBalanceView
         {

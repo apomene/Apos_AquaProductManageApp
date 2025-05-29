@@ -1,4 +1,5 @@
 ﻿
+
 -- Table: Cages
 CREATE TABLE Cages (
     CageId INT IDENTITY(1,1) PRIMARY KEY,
@@ -30,9 +31,12 @@ GO
 -- Table: FishTransfers
 CREATE TABLE FishTransfers (
     TransferId INT IDENTITY(1,1) PRIMARY KEY,
-    SourceCageId INT NOT NULL,
+    FromCageId INT NOT NULL,
+    ToCageId INT NOT NULL,
     TransferDate DATE NOT NULL,
-    CONSTRAINT FK_Transfer_SourceCage FOREIGN KEY (SourceCageId) REFERENCES Cages(CageId)
+    Quantity INT NOT NULL,
+    CONSTRAINT FK_Transfer_FromCage FOREIGN KEY (FromCageId) REFERENCES Cages(CageId),
+    CONSTRAINT FK_Transfer_ToCage FOREIGN KEY (ToCageId) REFERENCES Cages(CageId)
 );
 GO
 
