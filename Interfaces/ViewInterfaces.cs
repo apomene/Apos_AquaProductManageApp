@@ -9,32 +9,32 @@ namespace Apos_AquaProductManageApp.Interfaces
     {
         public interface ICageView
         {
-            void SetPresenter(Presenter.CagePresenter presenter);
             void DisplayCages(List<FishFarmModel.Cage> cages);
+            void SetPresenter(CagePresenter cagePresenter);
         }
         public interface IStockingView
         {
-            void SetPresenter(Presenter.StockingPresenter presenter);
             void DisplayStockings(List<FishFarmModel.Stocking> stockings);
+            void SetPresenter(StockingPresenter stockingPresenter);
         }
         public interface IMortalityView
         {
-            void SetPresenter(Presenter.MortalityPresenter presenter);
+            void SetPresenter(MortalityPresenter presenter);
             void DisplayMortalities(List<FishFarmModel.Mortality> mortalities);
         }
         public interface ITransferView
         {
-            void SetPresenter(Presenter.TransferPresenter presenter);
+            void SetPresenter(TransferPresenter presenter);
             void DisplayTransfers(List<FishFarmModel.Transfer> transfers);
         }
         public interface IBalanceView
         {
-            void SetPresenter(Presenter.BalancePresenter presenter);
+            void SetPresenter(BalancePresenter presenter);
             void DisplayBalances(List<FishFarmModel.StockBalance> balances);
         }
         public interface IMortalityPivotView
         {
-            void SetPresenter(Presenter.MortalityPivotPresenter presenter);
+            void SetPresenter(MortalityPivotPresenter presenter);
             void DisplayPivot(Dictionary<string, int> pivotData);
         }
     }

@@ -1,7 +1,7 @@
 using Apos_AquaProductManageApp.DBContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using static Apos_AquaProductManageApp.Presenters.Presenter;
+using Apos_AquaProductManageApp.Presenters;
 
 namespace Apos_AquaProductManageApp
 {

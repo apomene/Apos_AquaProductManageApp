@@ -1,8 +1,8 @@
 
-using System;
+using Apos_AquaProductManageApp.Presenters;
 using static Apos_AquaProductManageApp.Interfaces.ViewInterfaces;
 using static Apos_AquaProductManageApp.Model.FishFarmModel;
-using static Apos_AquaProductManageApp.Presenters.Presenter;
+
 
 namespace Apos_AquaProductManageApp
 {
