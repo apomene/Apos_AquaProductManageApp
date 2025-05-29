@@ -37,6 +37,7 @@ namespace Apos_AquaProductManageApp
             gridStocked.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             btnAdd.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             numQuantity.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+           
 
             btnAdd.Click += (s, e) =>
             {
@@ -53,12 +54,22 @@ namespace Apos_AquaProductManageApp
             this.Controls.Add(lblQuantity);
             this.Controls.Add(numQuantity);
             this.Controls.Add(btnAdd);
+           // gridStocked.Columns["Cage"].Visible = false;
             this.Text = "Fish Stocking";
 
         }
 
         public void SetPresenter(StockingPresenter presenter) { _presenter = presenter; _presenter.LoadStockingData(DateTime.Today); }
         public void DisplayAvailableCages(List<Cage> cages) { gridAvailable.DataSource = null; gridAvailable.DataSource = cages; }
-        public void DisplayStockings(List<FishStocking> stockings) { gridStocked.DataSource = null; gridStocked.DataSource = stockings; }
+        public void DisplayStockings(List<FishStocking> stockings) 
+        { 
+            gridStocked.DataSource = null; 
+            gridStocked.DataSource = stockings;
+            // Ensure columns are generated before trying to access them
+            if (gridStocked.Columns["Cage"] != null)
+            {
+                gridStocked.Columns["Cage"].Visible = false;
+            }
+        }
     }
 }
