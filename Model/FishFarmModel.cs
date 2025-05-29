@@ -1,5 +1,6 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Apos_AquaProductManageApp.Model
 {
@@ -8,6 +9,7 @@ namespace Apos_AquaProductManageApp.Model
         public class Cage
         {
             [Key]
+            [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
             public int CageId { get; set; }
 
             public string Name { get; set; }

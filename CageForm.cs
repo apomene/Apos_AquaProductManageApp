@@ -47,6 +47,17 @@ namespace Apos_AquaProductManageApp
                 }
             };
 
+            _cageGrid.SelectionChanged += (s, e) =>
+            {
+                if (_cageGrid.SelectedRows.Count > 0)
+                {
+                    var cage = (Cage)_cageGrid.SelectedRows[0].DataBoundItem;
+                    txtName.Text = cage.Name;
+                    chkIsActive.Checked = cage.IsActive;
+                }
+            };
+
+
             this.Controls.Add(_cageGrid);
             this.Controls.Add(txtName);
             this.Controls.Add(chkIsActive);
@@ -61,7 +72,6 @@ namespace Apos_AquaProductManageApp
 
         public void SetPresenter(CagePresenter presenter) { _presenter = presenter; }
         public void DisplayCages(List<Cage> cages) { _cageGrid.DataSource = null; _cageGrid.DataSource = cages; }
-           // this.Height = 400;
         }
 
         
