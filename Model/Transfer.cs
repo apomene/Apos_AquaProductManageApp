@@ -15,8 +15,8 @@ namespace Apos_AquaProductManageApp.Model
         public DateTime TransferDate { get; set; }
         public int Quantity { get; set; }
 
-        public Cage FromCage { get; set; }
-        public Cage ToCage { get; set; }
+        public required Cage FromCage { get; set; }
+        public required Cage ToCage { get; set; }
     }
 
 }

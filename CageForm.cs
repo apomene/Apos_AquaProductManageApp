@@ -9,11 +9,11 @@ namespace Apos_AquaProductManageApp
 {
     public partial class CageForm : Form, ICageView
     {
-        private CagePresenter _presenter;
-        private DataGridView _cageGrid;
-        private TextBox txtName;
-        private CheckBox chkIsActive;
-        private Button btnAdd, btnDelete, btnUpdate;
+        private CagePresenter _presenter = null!;
+        private DataGridView _cageGrid = null!;
+        private TextBox txtName = null!;
+        private CheckBox chkIsActive = null!;
+        private Button btnAdd = null!, btnDelete = null!, btnUpdate = null!;
         public CageForm()
         {
             InitializeComponent();
@@ -33,31 +33,7 @@ namespace Apos_AquaProductManageApp
             btnUpdate = new Button { Text = "Update", Top = 240, Left = 90 };
             btnDelete = new Button { Text = "Delete", Top = 240, Left = 170 };
 
-            btnAdd.Click += (s, e) => _presenter.AddCage(txtName.Text, chkIsActive.Checked);
-            btnDelete.Click += (s, e) =>
-            {
-                if (_cageGrid.SelectedRows.Count > 0)
-                    _presenter.DeleteCage(((Cage)_cageGrid.SelectedRows[0].DataBoundItem).CageId);
-            };
-            btnUpdate.Click += (s, e) =>
-            {
-                if (_cageGrid.SelectedRows.Count > 0)
-                {
-                    var selected = (Cage)_cageGrid.SelectedRows[0].DataBoundItem;
-                    _presenter.UpdateCage(selected.CageId, txtName.Text, chkIsActive.Checked);
-                }
-            };
-
-            _cageGrid.SelectionChanged += (s, e) =>
-            {
-                if (_cageGrid.SelectedRows.Count > 0)
-                {
-                    var cage = (Cage)_cageGrid.SelectedRows[0].DataBoundItem;
-                    txtName.Text = cage.Name;
-                    chkIsActive.Checked = cage.IsActive;
-                }
-            };
-
+            InitializeEventHandlers();
 
             this.Controls.Add(_cageGrid);
             this.Controls.Add(txtName);
@@ -73,9 +49,55 @@ namespace Apos_AquaProductManageApp
 
         public void SetPresenter(CagePresenter presenter) { _presenter = presenter; }
         public void DisplayCages(List<Cage> cages) { _cageGrid.DataSource = null; _cageGrid.DataSource = cages; }
+
+        private Cage? GetSelectedCage()
+        {
+            if (_cageGrid.SelectedRows.Count > 0 &&
+                _cageGrid.SelectedRows[0].DataBoundItem is Cage cage)
+            {
+                return cage;
+            }
+
+            MessageBox.Show("Please select a valid cage.");
+            return null;
         }
 
-        
+        private void InitializeEventHandlers()
+        {
+            btnAdd.Click += (s, e) => _presenter.AddCage(txtName.Text, chkIsActive.Checked);
+
+            btnDelete.Click += (s, e) =>
+            {
+                var cage = GetSelectedCage();
+                if (cage != null)
+                {
+                    _presenter.DeleteCage(cage.CageId);
+                }
+            };
+
+            btnUpdate.Click += (s, e) =>
+            {
+                var cage = GetSelectedCage();
+                if (cage != null)
+                {
+                    _presenter.UpdateCage(cage.CageId, txtName.Text, chkIsActive.Checked);
+                }
+            };
+
+            _cageGrid.SelectionChanged += (s, e) =>
+            {
+                var cage = GetSelectedCage();
+                if (cage != null)
+                {
+                    txtName.Text = cage.Name;
+                    chkIsActive.Checked = cage.IsActive;
+                }
+            };
+        }
+
+    }
+
+
 
 }
 

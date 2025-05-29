@@ -6,21 +6,21 @@ namespace Apos_AquaProductManageApp
 {
     public partial class StockingForm : Form, IStockingView
     {
-        private StockingPresenter _presenter;
-        private DataGridView gridAvailable, gridStocked;
-        private DateTimePicker dtPicker;
-        private NumericUpDown numQuantity;
-        private Button btnAdd;
+        private StockingPresenter _presenter =null!;
+        private DataGridView gridAvailable = null!, gridStocked = null!;
+        private DateTimePicker dtPicker =null!;
+        private NumericUpDown numQuantity = null!;
+        private Button btnAdd = null!;
 
-        public StockingForm() 
-        { 
+        public StockingForm()
+        {
             InitializeComponent();
             Initialize();
         }
 
         private void Initialize()
         {
-        
+
             dtPicker = new DateTimePicker { Top = 10, Left = 10, Width = 200 };
             dtPicker.ValueChanged += (s, e) => _presenter.LoadStockingData(dtPicker.Value.Date);
 
@@ -37,14 +37,18 @@ namespace Apos_AquaProductManageApp
             gridStocked.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             btnAdd.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             numQuantity.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-           
+
 
             btnAdd.Click += (s, e) =>
             {
-                if (gridAvailable.SelectedRows.Count > 0)
+
+                if (gridAvailable.SelectedRows.Count > 0 && gridAvailable.SelectedRows[0].DataBoundItem is Cage cage)
                 {
-                    var cage = (Cage)gridAvailable.SelectedRows[0].DataBoundItem;
                     _presenter.AddStocking(cage.CageId, dtPicker.Value.Date, (int)numQuantity.Value);
+                }
+                else
+                {                   
+                    MessageBox.Show("Please select a valid cage.");
                 }
             };
 
@@ -54,16 +58,15 @@ namespace Apos_AquaProductManageApp
             this.Controls.Add(lblQuantity);
             this.Controls.Add(numQuantity);
             this.Controls.Add(btnAdd);
-           // gridStocked.Columns["Cage"].Visible = false;
             this.Text = "Fish Stocking";
 
         }
 
         public void SetPresenter(StockingPresenter presenter) { _presenter = presenter; _presenter.LoadStockingData(DateTime.Today); }
         public void DisplayAvailableCages(List<Cage> cages) { gridAvailable.DataSource = null; gridAvailable.DataSource = cages; }
-        public void DisplayStockings(List<FishStocking> stockings) 
-        { 
-            gridStocked.DataSource = null; 
+        public void DisplayStockings(List<FishStocking> stockings)
+        {
+            gridStocked.DataSource = null;
             gridStocked.DataSource = stockings;
             // Ensure columns are generated before trying to access them
             if (gridStocked.Columns["Cage"] != null)

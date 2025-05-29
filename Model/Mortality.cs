@@ -14,6 +14,6 @@ namespace Apos_AquaProductManageApp.Model
         public DateTime MortalityDate { get; set; }
         public int Quantity { get; set; }
 
-        public Cage Cage { get; set; }
+        public required Cage Cage { get; set; }
     }
 }

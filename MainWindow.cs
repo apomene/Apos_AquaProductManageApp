@@ -10,7 +10,7 @@ namespace Apos_AquaProductManageApp
 {
     public partial class MainWindow : Form
     {
-        private TabControl _tabControl;
+        private TabControl _tabControl=null!;
 
         public MainWindow(IServiceProvider serviceProvider)
         {
@@ -26,14 +26,23 @@ namespace Apos_AquaProductManageApp
 
             _tabControl = new TabControl { Dock = DockStyle.Fill };
 
-            AddTabWithPresenter<CageForm, ICageView, CagePresenter, CageService>(
-                "Cages", serviceProvider);
+            try
+            {
+                // Initialize the database context
+                var dbContext = serviceProvider.GetRequiredService<FishFarmDbContext>();
+                dbContext.Database.EnsureCreated();
+                AddTabWithPresenter<CageForm, ICageView, CagePresenter, CageService>(
+              "Cages", serviceProvider);
 
-            AddTabWithPresenter<StockingForm, IStockingView, StockingPresenter, StockingService>(
-                "Fish Stocking", serviceProvider);
+                AddTabWithPresenter<StockingForm, IStockingView, StockingPresenter, StockingService>(
+                    "Fish Stocking", serviceProvider);
 
-            this.Controls.Add(_tabControl);
-
+                this.Controls.Add(_tabControl);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error initializing database: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void AddTabWithPresenter<TForm, TView, TPresenter, TService>(
@@ -49,10 +58,15 @@ namespace Apos_AquaProductManageApp
             };
 
             var view = (TView)form;
-            var service = serviceProvider.GetRequiredService<TService>();
+            TService? service = serviceProvider.GetRequiredService<TService>();
 
-            // Dynamically create presenter instance using constructor injection
-            var presenter = (TPresenter)Activator.CreateInstance(typeof(TPresenter), view, service);
+            var presenterObj = Activator.CreateInstance(typeof(TPresenter), view, service);
+
+            if (presenterObj is not TPresenter presenter)
+            {
+                throw new InvalidOperationException($"Could not create instance of type {typeof(TPresenter).Name}.");
+            }
+      
 
             form.Show();
 
