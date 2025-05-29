@@ -36,14 +36,14 @@ namespace Apos_AquaProductManageApp
             btnDelete.Click += (s, e) =>
             {
                 if (_cageGrid.SelectedRows.Count > 0)
-                    _presenter.DeleteCage(((Cage)_cageGrid.SelectedRows[0].DataBoundItem).Id);
+                    _presenter.DeleteCage(((Cage)_cageGrid.SelectedRows[0].DataBoundItem).CageId);
             };
             btnUpdate.Click += (s, e) =>
             {
                 if (_cageGrid.SelectedRows.Count > 0)
                 {
                     var selected = (Cage)_cageGrid.SelectedRows[0].DataBoundItem;
-                    _presenter.UpdateCage(selected.Id, txtName.Text, chkIsActive.Checked);
+                    _presenter.UpdateCage(selected.CageId, txtName.Text, chkIsActive.Checked);
                 }
             };
 

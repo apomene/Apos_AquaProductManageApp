@@ -1,8 +1,4 @@
 ﻿
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
 using Microsoft.EntityFrameworkCore;
 using static Apos_AquaProductManageApp.Model.FishFarmModel;
 
@@ -10,6 +6,7 @@ namespace Apos_AquaProductManageApp.DBContext
 {    
     public class FishFarmDbContext : DbContext
     {
+        public FishFarmDbContext(DbContextOptions<FishFarmDbContext> options) : base(options) { }
         public DbSet<Cage> Cages { get; set; }
         
 
@@ -17,41 +14,41 @@ namespace Apos_AquaProductManageApp.DBContext
 
     public class CageService
     {
+        private readonly FishFarmDbContext _db;
+        public CageService(FishFarmDbContext db) { _db = db; }
+
         public List<Cage> GetAllCages()
         {
-            using var db = new FishFarmDbContext();
-            return db.Cages.ToList();
+            return _db.Cages.Any() ? _db.Cages.ToList() : new List<Cage>();
         }
 
         public void AddCage(string name, bool isActive)
         {
-            using var db = new FishFarmDbContext();
-            db.Cages.Add(new Cage { Name = name, IsActive = isActive });
-            db.SaveChanges();
+            _db.Cages.Add(new Cage { Name = name, IsActive = isActive });
+            _db.SaveChanges();
         }
 
         public void DeleteCage(int id)
         {
-            using var db = new FishFarmDbContext();
-            var cage = db.Cages.Find(id);
+            var cage = _db.Cages.Find(id);
             if (cage != null)
             {
-                db.Cages.Remove(cage);
-                db.SaveChanges();
+                _db.Cages.Remove(cage);
+                _db.SaveChanges();
             }
         }
 
         public void UpdateCage(int id, string name, bool isActive)
         {
-            using var db = new FishFarmDbContext();
-            var cage = db.Cages.Find(id);
+            var cage = _db.Cages.Find(id);
             if (cage != null)
             {
                 cage.Name = name;
                 cage.IsActive = isActive;
-                db.SaveChanges();
+                _db.SaveChanges();
             }
         }
     }
+
 
 }

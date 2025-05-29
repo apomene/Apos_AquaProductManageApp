@@ -16,7 +16,7 @@ namespace Apos_AquaProductManageApp
             var services = new ServiceCollection();
 
             services.AddDbContext<FishFarmDbContext>(options =>
-                options.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=FishFarmDB;Trusted_Connection=True;"));
+                options.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=FishFarmDB;Trusted_Connection=True;TrustServerCertificate=True;"));
             services.AddTransient<CageService>();
 
             var provider = services.BuildServiceProvider();
