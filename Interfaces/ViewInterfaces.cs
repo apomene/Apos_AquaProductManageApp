@@ -1,7 +1,6 @@
-﻿
-using Apos_AquaProductManageApp.Model;
+﻿using Apos_AquaProductManageApp.Model;
 using Apos_AquaProductManageApp.Presenters;
-
+using static Apos_AquaProductManageApp.Model.FishFarmModel;
 
 namespace Apos_AquaProductManageApp.Interfaces
 {
@@ -9,12 +8,12 @@ namespace Apos_AquaProductManageApp.Interfaces
     {
         public interface ICageView
         {
-            void DisplayCages(List<FishFarmModel.Cage> cages);
+            void DisplayCages(List<Cage> cages);
             void SetPresenter(CagePresenter cagePresenter);
         }
         public interface IStockingView
         {
-            void DisplayStockings(List<FishFarmModel.Stocking> stockings);
+            void DisplayStockings(List<FishStocking> stockings);
             void SetPresenter(StockingPresenter stockingPresenter);
         }
         public interface IMortalityView
@@ -39,3 +38,4 @@ namespace Apos_AquaProductManageApp.Interfaces
         }
     }
 }
+
