@@ -16,9 +16,20 @@ namespace Apos_AquaProductManageApp.DBContext
 
         public List<Cage> GetAvailableCagesForStocking(DateTime date)
         {
-            var stockedCageIds = _db.FishStockings.Where(s => s.StockingDate == date).Select(s => s.CageId).ToList();
-            return _db.Cages.Where(c => !stockedCageIds.Contains(c.CageId)).ToList();
+            // First, retrieve all cages that are active
+            var allCages = _db.Cages.Where(c => c.IsActive).ToList();
+
+            // Then, find cages that have already been stocked on the selected date
+            var stockedCageIds = _db.FishStockings
+                .Where(s => s.StockingDate == date)
+                .Select(s => s.CageId)
+                .Distinct()
+                .ToList();
+
+            // Return cages that are not in the stocked list
+            return allCages.Where(c => !stockedCageIds.Contains(c.CageId)).ToList();
         }
+
 
         public void AddStocking(int cageId, DateTime date, int quantity)
         {

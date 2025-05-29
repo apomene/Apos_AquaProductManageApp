@@ -1,6 +1,6 @@
 ﻿namespace Apos_AquaProductManageApp
 {
-    partial class StockingForm
+    partial class MainWindow
     {
         /// <summary>
         /// Required designer variable.
@@ -30,17 +30,15 @@
         {
             SuspendLayout();
             // 
-            // StockingForm
+            // MainWindow
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            AutoSize = true;
-            ClientSize = new Size(800, 553);
-            MaximumSize = new Size(1920, 1080);
+            ClientSize = new Size(1582, 853);
             MinimumSize = new Size(800, 600);
-            Name = "StockingForm";
-            StartPosition = FormStartPosition.CenterParent;
-            Text = "StockingForm";
+            Name = "MainWindow";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "MainWindow";
             ResumeLayout(false);
         }
 

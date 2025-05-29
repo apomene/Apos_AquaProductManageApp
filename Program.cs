@@ -27,7 +27,9 @@ namespace Apos_AquaProductManageApp
 
             var stockingForm = new StockingForm();
             var presenter = new StockingPresenter(stockingForm, provider.GetRequiredService<StockingService>());
-            Application.Run(stockingForm);
+            var mainWindow = new MainWindow(provider);
+            Application.Run(mainWindow);
+
         }
     }
 }
