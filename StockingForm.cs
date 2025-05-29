@@ -68,11 +68,16 @@ namespace Apos_AquaProductManageApp
         {
             gridStocked.DataSource = null;
             gridStocked.DataSource = stockings;
-            // Ensure columns are generated before trying to access them
-            if (gridStocked.Columns["Cage"] != null)
+
+            if (gridStocked.Columns != null && gridStocked.Columns["Cage"] != null)
             {
-                gridStocked.Columns["Cage"].Visible = false;
+                var cageColumn = gridStocked.Columns?["Cage"];
+                if (cageColumn != null)
+                {
+                    cageColumn.Visible = false;
+                }
             }
+
         }
     }
 }

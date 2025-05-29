@@ -58,7 +58,7 @@ namespace Apos_AquaProductManageApp
             };
 
             var view = (TView)form;
-            TService? service = serviceProvider.GetRequiredService<TService>();
+            TService service = serviceProvider.GetRequiredService<TService>();
 
             var presenterObj = Activator.CreateInstance(typeof(TPresenter), view, service);
 

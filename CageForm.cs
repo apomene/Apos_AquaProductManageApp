@@ -58,7 +58,6 @@ namespace Apos_AquaProductManageApp
                 return cage;
             }
 
-            MessageBox.Show("Please select a valid cage.");
             return null;
         }
 
