@@ -1,5 +1,4 @@
-﻿
-using Apos_AquaProductManageApp.Model;
+﻿using Apos_AquaProductManageApp.Services;
 using static Apos_AquaProductManageApp.Interfaces.ViewInterfaces;
 
 namespace Apos_AquaProductManageApp.Presenters
@@ -7,7 +6,39 @@ namespace Apos_AquaProductManageApp.Presenters
     public class MortalityPresenter
     {
         private readonly IMortalityView _view;
-        public MortalityPresenter(IMortalityView view) { _view = view; view.SetPresenter(this); }
-        public void LoadMortalities(DateTime date) { _view.DisplayMortalities(new List<Mortality>()); }
+        private readonly MortalityService _mortalityService;
+        private readonly StockBalanceService _balanceService;
+
+        public MortalityPresenter(IMortalityView view, MortalityService mortalityService, StockBalanceService balanceService)
+        {
+            _view = view;
+            _mortalityService = mortalityService;
+            _balanceService = balanceService;
+            _view.SetPresenter(this);
+        }
+
+        public void LoadData(DateTime date)
+        {
+            var cages = _mortalityService.GetCagesEligibleForMortality(date);
+            var mortalities = _mortalityService.GetMortalitiesByDate(date);
+
+            _view.DisplayEligibleCages(cages);
+            _view.DisplayMortalities(mortalities);
+        }
+
+        public void AddOrUpdateMortality(int cageId, DateTime date, int quantity)
+        {
+            int availableStock = _balanceService.GetStockBalance(cageId, date);
+            if (quantity > availableStock)
+            {
+                MessageBox.Show($"Cannot register mortality: available stock is {availableStock}.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            _mortalityService.AddOrUpdateMortality(cageId, date, quantity);
+            LoadData(date);
+        }
     }
+
+
 }

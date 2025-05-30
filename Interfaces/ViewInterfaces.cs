@@ -16,8 +16,11 @@ namespace Apos_AquaProductManageApp.Interfaces
         public interface IMortalityView
         {
             void SetPresenter(MortalityPresenter presenter);
+            void DisplayEligibleCages(List<Cage> cages);
             void DisplayMortalities(List<Mortality> mortalities);
+            DateTime GetSelectedDate();
         }
+
         public interface ITransferView
         {
             void SetPresenter(TransferPresenter presenter);

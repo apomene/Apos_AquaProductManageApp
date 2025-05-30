@@ -2,7 +2,7 @@
 using Apos_AquaProductManageApp.Presenters;
 using Microsoft.Extensions.DependencyInjection;
 using static Apos_AquaProductManageApp.Interfaces.ViewInterfaces;
-using System.Windows.Forms;
+using Apos_AquaProductManageApp.Services;
 
 
 
@@ -37,6 +37,10 @@ namespace Apos_AquaProductManageApp
                 AddTabWithPresenter<StockingForm, IStockingView, StockingPresenter, StockingService>(
                     "Fish Stocking", serviceProvider);
 
+                AddMortalityTab(serviceProvider);
+
+                //AddTabWithPresenter<TransferForm, ITransferView, TransferPresenter, TransferService>(
+                //    "Fish Transfers", serviceProvider);
                 this.Controls.Add(_tabControl);
             }
             catch (Exception ex)
@@ -74,6 +78,28 @@ namespace Apos_AquaProductManageApp
             tabPage.Controls.Add(form);
             _tabControl.TabPages.Add(tabPage);
         }
+
+        private void AddMortalityTab(IServiceProvider serviceProvider)
+        {
+            var form = new MortalityForm
+            {
+                TopLevel = false,
+                FormBorderStyle = FormBorderStyle.None,
+                Dock = DockStyle.Fill
+            };
+
+            var view = (IMortalityView)form;
+            var mortalityService = serviceProvider.GetRequiredService<MortalityService>();
+            var balanceService = serviceProvider.GetRequiredService<StockBalanceService>();
+
+            var presenter = new MortalityPresenter(view, mortalityService, balanceService);
+
+            form.Show();
+            var tabPage = new TabPage("Fish Mortalities");
+            tabPage.Controls.Add(form);
+            _tabControl.TabPages.Add(tabPage);
+        }
+
 
 
     }

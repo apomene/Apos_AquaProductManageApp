@@ -1,6 +1,4 @@
-﻿
-using Apos_AquaProductManageApp.DBContext;
-using Apos_AquaProductManageApp.Model;
+﻿using Apos_AquaProductManageApp.Services;
 using static Apos_AquaProductManageApp.Interfaces.ViewInterfaces;
 
 
@@ -15,19 +13,38 @@ namespace Apos_AquaProductManageApp.Presenters
         {
             _view = view;
             _service = service;
-            view.SetPresenter(this);
+            _view.SetPresenter(this);
+
+            LoadStockingData(DateTime.Today); // Initialize with today's data
         }
 
-        public void LoadStockingData(DateTime date)
+        public void LoadStockingData(DateTime selectedDate)
         {
-            _view.DisplayAvailableCages(_service.GetAvailableCagesForStocking(date));
-            _view.DisplayStockings(_service.GetStockingsByDate(date));
+            var availableCages = _service.GetAvailableCagesForStocking(selectedDate);
+            var existingStockings = _service.GetStockingsByDate(selectedDate);
+
+            _view.DisplayAvailableCages(availableCages);
+            _view.DisplayStockings(existingStockings);
         }
 
         public void AddStocking(int cageId, DateTime date, int quantity)
         {
-            _service.AddStocking(cageId, date, quantity);
-            LoadStockingData(date);
+            if (quantity <= 0)
+            {
+                MessageBox.Show("Quantity must be greater than zero.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                _service.AddStocking(cageId, date, quantity);
+                LoadStockingData(date);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to add stocking: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
+
 }

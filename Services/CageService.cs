@@ -1,7 +1,8 @@
-﻿using Apos_AquaProductManageApp.Model;
+﻿using Apos_AquaProductManageApp.DBContext;
+using Apos_AquaProductManageApp.Model;
 
 
-namespace Apos_AquaProductManageApp.DBContext
+namespace Apos_AquaProductManageApp.Services
 {
     public class CageService
     {
