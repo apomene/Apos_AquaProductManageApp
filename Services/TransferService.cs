@@ -1,8 +1,6 @@
 ﻿using Apos_AquaProductManageApp.DBContext;
 using Apos_AquaProductManageApp.Model;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography.Xml;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Apos_AquaProductManageApp.Services
 {
@@ -71,6 +69,30 @@ namespace Apos_AquaProductManageApp.Services
                 .Sum(t => (int?)t.Quantity) ?? 0;
 
             return stocked - dead - transfersOut + transfersIn;
+        }
+
+        public List<StockBalance> GetDailyBalances(DateTime date)
+        {
+            var cages = _context.Cages.ToList();
+            return cages.Select(cage => new StockBalance
+            {
+                Cage = cage,
+                Balance = CalculateBalance(cage.CageId, date)
+            }).ToList();
+        }
+
+        public List<MortalityPivot> GetMortalityPivot()
+        {
+            return _context.Mortalities
+                .GroupBy(m => new { m.CageId, m.MortalityDate.Year, m.MortalityDate.Month })
+                .Select(g => new MortalityPivot
+                {
+                    CageId = g.Key.CageId,
+                    Year = g.Key.Year,
+                    Month = g.Key.Month,
+                    TotalMortalities = g.Sum(x => x.Quantity)
+                })
+                .ToList();
         }
     }
 

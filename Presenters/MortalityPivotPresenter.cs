@@ -1,4 +1,5 @@
 ﻿
+using Apos_AquaProductManageApp.Services;
 using static Apos_AquaProductManageApp.Interfaces.ViewInterfaces;
 
 namespace Apos_AquaProductManageApp.Presenters
@@ -6,7 +7,20 @@ namespace Apos_AquaProductManageApp.Presenters
     public class MortalityPivotPresenter
     {
         private readonly IMortalityPivotView _view;
-        public MortalityPivotPresenter(IMortalityPivotView view) { _view = view; view.SetPresenter(this); }
-        public void LoadPivot() { _view.DisplayPivot(new Dictionary<string, int>()); }
+        private readonly TransferService _service;
+
+        public MortalityPivotPresenter(IMortalityPivotView view, TransferService service)
+        {
+            _view = view;
+            _service = service;
+            _view.SetPresenter(this);
+        }
+
+        public void LoadPivot()
+        {
+            var pivotData = _service.GetMortalityPivot();
+            _view.DisplayPivot(pivotData);
+        }
     }
+
 }

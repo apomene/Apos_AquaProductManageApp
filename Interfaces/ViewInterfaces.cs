@@ -1,7 +1,6 @@
 ﻿using Apos_AquaProductManageApp.Model;
 using Apos_AquaProductManageApp.Presenters;
-using System.Security.Cryptography.Xml;
-using static Apos_AquaProductManageApp.Model.FishFarmModel;
+
 
 namespace Apos_AquaProductManageApp.Interfaces
 {
@@ -32,12 +31,12 @@ namespace Apos_AquaProductManageApp.Interfaces
         public interface IBalanceView
         {
             void SetPresenter(BalancePresenter presenter);
-            void DisplayBalances(List<FishFarmModel.StockBalance> balances);
+            void DisplayBalances(List<StockBalance> balances);
         }
         public interface IMortalityPivotView
         {
             void SetPresenter(MortalityPivotPresenter presenter);
-            void DisplayPivot(Dictionary<string, int> pivotData);
+            void DisplayPivot(List<MortalityPivot> pivot);
         }
     }
 }
