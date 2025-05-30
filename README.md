@@ -37,23 +37,14 @@ The solution includes multiple forms, each representing a UI module with its own
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/yourusername/your-winforms-app.git
-   cd your-winforms-app
+   git clone https://github.com/apomene/Apos_AquaProductManageApp
+   
 
-2.et up the database:
+2.Set up the database:
 
     Create a new database in SQL Server 2019.
 
     Run the provided SQL scripts (in /FishFarmDB) to initialize tables and seed data.
 
-    Update the connection string in App.config:
-    ```xml
-
-    <connectionStrings>
-  <add name="DefaultConnection" 
-       connectionString="Server=YOUR_SERVER_NAME;Database=YOUR_DB_NAME;Trusted_Connection=True;" 
-       providerName="System.Data.SqlClient" />
-</connectionStrings>
-    ```
-
+    Update the connection string in App.config
 
