@@ -48,7 +48,8 @@ namespace Apos_AquaProductManageApp.Views
 
         public void DisplayBalances(List<StockBalance> balances)
         {
-            gridBalances.DataSource = balances;
+
+            Utilities.BindDataSource(gridBalances, balances, "Cage");
         }
     }
 

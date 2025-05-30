@@ -1,6 +1,6 @@
 ﻿using Apos_AquaProductManageApp.Model;
 using Apos_AquaProductManageApp.Presenters;
-using System.Configuration;
+using Apos_AquaProductManageApp.Views;
 using static Apos_AquaProductManageApp.Interfaces.ViewInterfaces;
 
 namespace Apos_AquaProductManageApp
@@ -16,18 +16,10 @@ namespace Apos_AquaProductManageApp
         public StockingForm()
         {
             InitializeComponent();
-            InitializeSizeFromConfig();
+            Utilities.InitializeFormSizeFromConfig(this, "StockingForm");
             Initialize();
         }
-
-        private void InitializeSizeFromConfig()
-        {
-            if (int.TryParse(ConfigurationManager.AppSettings["StockingForm.Width"], out int width))
-                this.Width = width;
-            if (int.TryParse(ConfigurationManager.AppSettings["StockingForm.Height"], out int height))
-                this.Height = height;
-        }
-
+     
         private void Initialize()
         {
 
@@ -76,18 +68,7 @@ namespace Apos_AquaProductManageApp
         public void DisplayAvailableCages(List<Cage> cages) { gridAvailable.DataSource = null; gridAvailable.DataSource = cages; }
         public void DisplayStockings(List<FishStocking> stockings)
         {
-            gridStocked.DataSource = null;
-            gridStocked.DataSource = stockings;
-
-            if (gridStocked.Columns != null && gridStocked.Columns["Cage"] != null)
-            {
-                var cageColumn = gridStocked.Columns?["Cage"];
-                if (cageColumn != null)
-                {
-                    cageColumn.Visible = false;
-                }
-            }
-
+            Utilities.BindDataSource(gridStocked, stockings, "Cage");
         }
     }
 }

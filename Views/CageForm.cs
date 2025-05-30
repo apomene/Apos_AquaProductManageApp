@@ -2,7 +2,7 @@
 using Apos_AquaProductManageApp.Presenters;
 using static Apos_AquaProductManageApp.Interfaces.ViewInterfaces;
 using Apos_AquaProductManageApp.Model;
-using System.Configuration;
+using Apos_AquaProductManageApp.Views;
 
 
 
@@ -18,18 +18,11 @@ namespace Apos_AquaProductManageApp
         public CageForm()
         {
             InitializeComponent();
-            InitializeSizeFromConfig();
+            Utilities.InitializeFormSizeFromConfig(this, "CageForm");
+
             Initialize();
         }
-
-        private void InitializeSizeFromConfig()
-        {
-            if (int.TryParse(ConfigurationManager.AppSettings["CageForm.Width"], out int width))
-                this.Width = width;
-            if (int.TryParse(ConfigurationManager.AppSettings["CageForm.Height"], out int height))
-                this.Height = height;
-        }
-
+      
         private void Initialize()
         {
             _cageGrid = new DataGridView { Dock = DockStyle.Top, Height = 200, AutoGenerateColumns = true };

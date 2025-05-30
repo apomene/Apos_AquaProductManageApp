@@ -1,15 +1,8 @@
 ﻿using Apos_AquaProductManageApp.Model;
 using Apos_AquaProductManageApp.Presenters;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+using Apos_AquaProductManageApp.Views;
 using System.Configuration;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using static Apos_AquaProductManageApp.Interfaces.ViewInterfaces;
 
 namespace Apos_AquaProductManageApp
@@ -26,18 +19,11 @@ namespace Apos_AquaProductManageApp
         public MortalityForm() 
         { 
             InitializeComponent();
-            InitializeSizeFromConfig();
+            Utilities.InitializeFormSizeFromConfig(this, "MortalityForm");
+
             Initialize();
         }
-
-        private void InitializeSizeFromConfig()
-        {
-            if (int.TryParse(ConfigurationManager.AppSettings["MortalityForm.Width"], out int width))
-                this.Width = width;
-            if (int.TryParse(ConfigurationManager.AppSettings["MortalityForm.Height"], out int height))
-                this.Height = height;
-        }
-
+     
         private void Initialize()
         {
             this.Text = "Mortality Registration";

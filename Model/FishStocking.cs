@@ -14,8 +14,7 @@ namespace Apos_AquaProductManageApp.Model
         public int CageId { get; set; }
         public DateTime StockingDate  { get; set; } 
         public int Quantity { get; set; }
-        // Navigation property
-        public virtual  Cage? Cage { get; set; }
+        public Cage? Cage { get; set; }
 
         // Not mapped to DB, just for display
         [NotMapped]

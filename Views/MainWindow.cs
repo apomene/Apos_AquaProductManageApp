@@ -3,7 +3,6 @@ using Apos_AquaProductManageApp.Presenters;
 using Microsoft.Extensions.DependencyInjection;
 using static Apos_AquaProductManageApp.Interfaces.ViewInterfaces;
 using Apos_AquaProductManageApp.Services;
-using System.Configuration;
 using Apos_AquaProductManageApp.Views;
 
 
@@ -16,16 +15,10 @@ namespace Apos_AquaProductManageApp
         public MainWindow(IServiceProvider serviceProvider)
         {
             InitializeComponent();
-            InitializeSizeFromConfig();
+            Utilities.InitializeFormSizeFromConfig(this, "MainWindow");
             Initialize(serviceProvider);
         }
-        private void InitializeSizeFromConfig()
-        {
-            if (int.TryParse(ConfigurationManager.AppSettings["MainWindow.Width"], out int width))
-                this.Width = width;
-            if (int.TryParse(ConfigurationManager.AppSettings["MainWindow.Height"], out int height))
-                this.Height = height;
-        }
+       
 
         private void Initialize(IServiceProvider serviceProvider)
         {

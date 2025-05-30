@@ -1,8 +1,7 @@
 ﻿using Apos_AquaProductManageApp.Model;
 using Apos_AquaProductManageApp.Presenters;
+using Apos_AquaProductManageApp.Views;
 using System.ComponentModel;
-using System.Configuration;
-using System.Security.Cryptography.Xml;
 using static Apos_AquaProductManageApp.Interfaces.ViewInterfaces;
 
 namespace Apos_AquaProductManageApp
@@ -22,18 +21,12 @@ namespace Apos_AquaProductManageApp
         public TransferForm()
         {
             InitializeComponent();
-            InitializeSizeFromConfig();
+            Utilities.InitializeFormSizeFromConfig(this, "TransferForm");
             Initialize();
             
         }
 
-        private void InitializeSizeFromConfig()
-        {
-            if (int.TryParse(ConfigurationManager.AppSettings["TransferForm.Width"], out int width))
-                this.Width = width;
-            if (int.TryParse(ConfigurationManager.AppSettings["TransferForm.Height"], out int height))
-                this.Height = height;
-        }
+      
 
         private void Initialize()
         {
@@ -76,20 +69,7 @@ namespace Apos_AquaProductManageApp
 
         public void DisplayTransfers(List<FishTransfer> transfers)
         {
-            transfersGrid.DataSource = null;
-            transfersGrid.DataSource = transfers;
-
-            if (transfersGrid.Columns != null)
-            {
-                if (transfersGrid.Columns["FromCage"] != null && transfersGrid.Columns["ToCage"] != null)
-                {
-                    var fromCageColumn = transfersGrid.Columns?["FromCage"];
-                    var toCageColumn = transfersGrid.Columns?["ToCage"];
-                    fromCageColumn!.Visible = false;
-                    toCageColumn!.Visible = false;
-                }
-            }
-               
+            Utilities.BindDataSource(transfersGrid, transfers, "ToCage", "FromCage");             
         }
 
         public void DisplayCages(List<Cage> cages)
