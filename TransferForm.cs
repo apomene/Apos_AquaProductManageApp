@@ -75,14 +75,33 @@ namespace Apos_AquaProductManageApp
 
         public void DisplayTransfers(List<FishTransfer> transfers)
         {
+            transfersGrid.DataSource = null;
             transfersGrid.DataSource = transfers;
+
+            if (transfersGrid.Columns != null)
+            {
+                if (transfersGrid.Columns["FromCage"] != null && transfersGrid.Columns["ToCage"] != null)
+                {
+                    var fromCageColumn = transfersGrid.Columns?["FromCage"];
+                    var toCageColumn = transfersGrid.Columns?["ToCage"];
+                    fromCageColumn.Visible = false;
+                    toCageColumn.Visible = false;
+                }
+            }
+               
         }
 
         public void DisplayCages(List<Cage> cages)
         {
             fromCageComboBox.DataSource = new BindingList<Cage>(cages);
+            fromCageComboBox.DisplayMember = "Name";
+            fromCageComboBox.ValueMember = "CageId";
+
             toCageComboBox.DataSource = new BindingList<Cage>(cages);
+            toCageComboBox.DisplayMember = "Name";
+            toCageComboBox.ValueMember = "CageId";
         }
+
 
         private void addButton_Click(object sender, EventArgs e)
         {

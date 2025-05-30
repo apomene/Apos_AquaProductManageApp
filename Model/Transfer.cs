@@ -17,6 +17,13 @@ namespace Apos_AquaProductManageApp.Model
 
         public required Cage FromCage { get; set; }
         public required Cage ToCage { get; set; }
+
+        // Not mapped to DB, just for display
+        [NotMapped]
+        public string FromCageName => FromCage?.Name ?? "Unknown";
+        // Not mapped to DB, just for display
+        [NotMapped]
+        public string ToCageName => ToCage?.Name ?? "Unknown";
     }
 
 }
