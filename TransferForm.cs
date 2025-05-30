@@ -1,6 +1,7 @@
 ﻿using Apos_AquaProductManageApp.Model;
 using Apos_AquaProductManageApp.Presenters;
 using System.ComponentModel;
+using System.Configuration;
 using static Apos_AquaProductManageApp.Interfaces.ViewInterfaces;
 
 namespace Apos_AquaProductManageApp
@@ -20,8 +21,17 @@ namespace Apos_AquaProductManageApp
         public TransferForm()
         {
             InitializeComponent();
+            InitializeSizeFromConfig();
             Initialize();
             
+        }
+
+        private void InitializeSizeFromConfig()
+        {
+            if (int.TryParse(ConfigurationManager.AppSettings["TransferForm.Width"], out int width))
+                this.Width = width;
+            if (int.TryParse(ConfigurationManager.AppSettings["TransferForm.Height"], out int height))
+                this.Height = height;
         }
 
         private void Initialize()

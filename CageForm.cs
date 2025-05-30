@@ -2,6 +2,7 @@
 using Apos_AquaProductManageApp.Presenters;
 using static Apos_AquaProductManageApp.Interfaces.ViewInterfaces;
 using Apos_AquaProductManageApp.Model;
+using System.Configuration;
 
 
 
@@ -17,7 +18,16 @@ namespace Apos_AquaProductManageApp
         public CageForm()
         {
             InitializeComponent();
+            InitializeSizeFromConfig();
             Initialize();
+        }
+
+        private void InitializeSizeFromConfig()
+        {
+            if (int.TryParse(ConfigurationManager.AppSettings["CageForm.Width"], out int width))
+                this.Width = width;
+            if (int.TryParse(ConfigurationManager.AppSettings["CageForm.Height"], out int height))
+                this.Height = height;
         }
 
         private void Initialize()
@@ -43,8 +53,6 @@ namespace Apos_AquaProductManageApp
             this.Controls.Add(btnDelete);
 
             this.Text = "Cage Management";
-            this.Width = 500;
-            this.Height = 350;
         }
 
         public void SetPresenter(CagePresenter presenter) { _presenter = presenter; }

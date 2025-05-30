@@ -3,6 +3,7 @@ using Apos_AquaProductManageApp.Presenters;
 using Microsoft.Extensions.DependencyInjection;
 using static Apos_AquaProductManageApp.Interfaces.ViewInterfaces;
 using Apos_AquaProductManageApp.Services;
+using System.Configuration;
 
 
 
@@ -15,14 +16,20 @@ namespace Apos_AquaProductManageApp
         public MainWindow(IServiceProvider serviceProvider)
         {
             InitializeComponent();
+            InitializeSizeFromConfig();
             Initialize(serviceProvider);
+        }
+        private void InitializeSizeFromConfig()
+        {
+            if (int.TryParse(ConfigurationManager.AppSettings["MainWindow.Width"], out int width))
+                this.Width = width;
+            if (int.TryParse(ConfigurationManager.AppSettings["MainWindow.Height"], out int height))
+                this.Height = height;
         }
 
         private void Initialize(IServiceProvider serviceProvider)
         {
             this.Text = "Fish Farm Management";
-            this.Width = 800;
-            this.Height = 600;
 
             _tabControl = new TabControl { Dock = DockStyle.Fill };
 

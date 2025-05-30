@@ -3,6 +3,7 @@ using Apos_AquaProductManageApp.Presenters;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
 using System.Drawing;
 using System.Linq;
@@ -25,14 +26,21 @@ namespace Apos_AquaProductManageApp
         public MortalityForm() 
         { 
             InitializeComponent();
+            InitializeSizeFromConfig();
             Initialize();
+        }
+
+        private void InitializeSizeFromConfig()
+        {
+            if (int.TryParse(ConfigurationManager.AppSettings["MortalityForm.Width"], out int width))
+                this.Width = width;
+            if (int.TryParse(ConfigurationManager.AppSettings["MortalityForm.Height"], out int height))
+                this.Height = height;
         }
 
         private void Initialize()
         {
             this.Text = "Mortality Registration";
-            this.Width = 700;
-            this.Height = 500;
 
             dtPicker = new DateTimePicker { Top = 10, Left = 10, Width = 200 };
             dtPicker.ValueChanged += (s, e) => _presenter?.LoadData(dtPicker.Value.Date);
