@@ -1,5 +1,6 @@
 ﻿using Apos_AquaProductManageApp.Model;
 using Apos_AquaProductManageApp.Presenters;
+using static Apos_AquaProductManageApp.Services.TransferService;
 
 
 namespace Apos_AquaProductManageApp.Interfaces
@@ -34,9 +35,11 @@ namespace Apos_AquaProductManageApp.Interfaces
             void DisplayBalances(List<StockBalance> balances);
         }
         public interface IMortalityPivotView
-        {
-            void SetPresenter(MortalityPivotPresenter presenter);
-            void DisplayPivot(List<MortalityPivot> pivot);
+        {         
+                void SetPresenter(MortalityPivotPresenter presenter);
+                void DisplayPivot(List<MortalityPivot> data);
+                List<MortalityDimension> GetSelectedDimensions(); 
+            
         }
     }
 }

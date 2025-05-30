@@ -28,12 +28,33 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Text = "MortalityPivotForm";
+            LoadPivot = new Button();
+            SuspendLayout();
+            // 
+            // LoadPivot
+            // 
+            LoadPivot.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            LoadPivot.Location = new Point(20, 396);
+            LoadPivot.Name = "LoadPivot";
+            LoadPivot.Size = new Size(94, 29);
+            LoadPivot.TabIndex = 0;
+            LoadPivot.Text = "Load Pivot";
+            LoadPivot.UseVisualStyleBackColor = true;
+            LoadPivot.Click += LoadPivot_Click;
+            // 
+            // MortalityPivotForm
+            // 
+            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(800, 450);
+            Controls.Add(LoadPivot);
+            Name = "MortalityPivotForm";
+            Text = "MortalityPivotForm";
+            ResumeLayout(false);
         }
 
         #endregion
+
+        private Button LoadPivot;
     }
 }

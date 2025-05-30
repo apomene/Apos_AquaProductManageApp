@@ -81,19 +81,38 @@ namespace Apos_AquaProductManageApp.Services
             }).ToList();
         }
 
-        public List<MortalityPivot> GetMortalityPivot()
+        public enum MortalityDimension
         {
-            return _context.Mortalities
-                .GroupBy(m => new { m.CageId, m.MortalityDate.Year, m.MortalityDate.Month })
-                .Select(g => new MortalityPivot
-                {
-                    CageId = g.Key.CageId,
-                    Year = g.Key.Year,
-                    Month = g.Key.Month,
-                    TotalMortalities = g.Sum(x => x.Quantity)
-                })
-                .ToList();
+            Cage,
+            Year,
+            Month
         }
+
+        public List<MortalityPivot> GetMortalityPivot(List<MortalityDimension> dimensions)
+        {
+            var mortalities = _context.Mortalities.AsQueryable();
+
+            // Dynamic grouping
+            var grouped = mortalities.GroupBy(m =>
+                new
+                {
+                    CageId = dimensions.Contains(MortalityDimension.Cage) ? m.CageId : (int?)null,
+                    Year = dimensions.Contains(MortalityDimension.Year) ? m.MortalityDate.Year : (int?)null,
+                    Month = dimensions.Contains(MortalityDimension.Month) ? m.MortalityDate.Month : (int?)null
+                }
+            );
+
+            var result = grouped.Select(g => new MortalityPivot
+            {
+                CageId = g.Key.CageId,
+                Year = g.Key.Year,
+                Month = g.Key.Month,
+                TotalMortalities = g.Sum(x => x.Quantity)
+            });
+
+            return result.ToList();
+        }
+
     }
 
 }

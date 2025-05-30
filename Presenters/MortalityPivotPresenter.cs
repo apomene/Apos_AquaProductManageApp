@@ -1,6 +1,7 @@
 ﻿
 using Apos_AquaProductManageApp.Services;
 using static Apos_AquaProductManageApp.Interfaces.ViewInterfaces;
+using static Apos_AquaProductManageApp.Services.TransferService;
 
 namespace Apos_AquaProductManageApp.Presenters
 {
@@ -16,9 +17,9 @@ namespace Apos_AquaProductManageApp.Presenters
             _view.SetPresenter(this);
         }
 
-        public void LoadPivot()
+        public void LoadPivot(List<MortalityDimension> dimensions)
         {
-            var pivotData = _service.GetMortalityPivot();
+            var pivotData = _service.GetMortalityPivot(dimensions);
             _view.DisplayPivot(pivotData);
         }
     }

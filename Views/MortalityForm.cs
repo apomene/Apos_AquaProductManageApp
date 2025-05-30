@@ -35,7 +35,7 @@ namespace Apos_AquaProductManageApp
             {
                 Top = 40,
                 Left = 10,
-                Width = 300,
+                Width = 380,
                 Height = 150,
                 AutoGenerateColumns = true,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect
@@ -44,8 +44,8 @@ namespace Apos_AquaProductManageApp
             gridMortalities = new DataGridView
             {
                 Top = 40,
-                Left = 330,
-                Width = 340,
+                Left = 400,
+                Width = 380,
                 Height = 150,
                 AutoGenerateColumns = true,
                 ReadOnly = true
