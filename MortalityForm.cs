@@ -68,9 +68,10 @@ namespace Apos_AquaProductManageApp
 
             btnAdd = new Button
             {
-                Text = "Add / Update Mortality",
+                Text = "Add / Update",
                 Top = 210,
-                Left = 120
+                Left = 120,
+                Width = 100
             };
             btnAdd.Click += (s, e) =>
             {

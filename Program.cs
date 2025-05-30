@@ -22,6 +22,7 @@ namespace Apos_AquaProductManageApp
             services.AddTransient<StockingService>();
             services.AddTransient<MortalityService>();
             services.AddTransient<StockBalanceService>();
+            services.AddTransient<TransferService>();
 
 
             var provider = services.BuildServiceProvider();
@@ -29,8 +30,6 @@ namespace Apos_AquaProductManageApp
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            //var stockingForm = new StockingForm();
-            //var presenter = new StockingPresenter(stockingForm, provider.GetRequiredService<StockingService>());
             var mainWindow = new MainWindow(provider);
             Application.Run(mainWindow);
 

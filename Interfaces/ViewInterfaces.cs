@@ -1,5 +1,6 @@
 ﻿using Apos_AquaProductManageApp.Model;
 using Apos_AquaProductManageApp.Presenters;
+using System.Security.Cryptography.Xml;
 using static Apos_AquaProductManageApp.Model.FishFarmModel;
 
 namespace Apos_AquaProductManageApp.Interfaces
@@ -25,6 +26,8 @@ namespace Apos_AquaProductManageApp.Interfaces
         {
             void SetPresenter(TransferPresenter presenter);
             void DisplayTransfers(List<FishTransfer> transfers);
+            void DisplayCages(List<Cage> cages);
+            DateTime SelectedDate { get; }
         }
         public interface IBalanceView
         {

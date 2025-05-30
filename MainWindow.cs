@@ -10,7 +10,7 @@ namespace Apos_AquaProductManageApp
 {
     public partial class MainWindow : Form
     {
-        private TabControl _tabControl=null!;
+        private TabControl _tabControl = null!;
 
         public MainWindow(IServiceProvider serviceProvider)
         {
@@ -32,15 +32,17 @@ namespace Apos_AquaProductManageApp
                 var dbContext = serviceProvider.GetRequiredService<FishFarmDbContext>();
                 dbContext.Database.EnsureCreated();
                 AddTabWithPresenter<CageForm, ICageView, CagePresenter, CageService>(
-              "Cages", serviceProvider);
+                    "Cages", serviceProvider);
 
                 AddTabWithPresenter<StockingForm, IStockingView, StockingPresenter, StockingService>(
                     "Fish Stocking", serviceProvider);
 
                 AddMortalityTab(serviceProvider);
 
-                //AddTabWithPresenter<TransferForm, ITransferView, TransferPresenter, TransferService>(
-                //    "Fish Transfers", serviceProvider);
+                AddTransferTab(serviceProvider);
+
+
+
                 this.Controls.Add(_tabControl);
             }
             catch (Exception ex)
@@ -70,7 +72,7 @@ namespace Apos_AquaProductManageApp
             {
                 throw new InvalidOperationException($"Could not create instance of type {typeof(TPresenter).Name}.");
             }
-      
+
 
             form.Show();
 
@@ -99,6 +101,30 @@ namespace Apos_AquaProductManageApp
             tabPage.Controls.Add(form);
             _tabControl.TabPages.Add(tabPage);
         }
+
+        private void AddTransferTab(IServiceProvider serviceProvider)
+        {
+            var form = new TransferForm
+            {
+                TopLevel = false,
+                FormBorderStyle = FormBorderStyle.None,
+                Dock = DockStyle.Fill
+            };
+
+            var view = (ITransferView)form;
+
+            var transferService = serviceProvider.GetRequiredService<TransferService>();
+            var cageService = serviceProvider.GetRequiredService<CageService>();
+
+            var presenter = new TransferPresenter(view, transferService, cageService);
+
+            form.Show();
+
+            var tabPage = new TabPage("Fish Transfers");
+            tabPage.Controls.Add(form);
+            _tabControl.TabPages.Add(tabPage);
+        }
+
 
 
 
