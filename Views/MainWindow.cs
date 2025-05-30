@@ -7,7 +7,6 @@ using System.Configuration;
 using Apos_AquaProductManageApp.Views;
 
 
-
 namespace Apos_AquaProductManageApp
 {
     public partial class MainWindow : Form
@@ -31,30 +30,36 @@ namespace Apos_AquaProductManageApp
         private void Initialize(IServiceProvider serviceProvider)
         {
             this.Text = "Fish Farm Management";
-
             _tabControl = new TabControl { Dock = DockStyle.Fill };
 
             try
             {
-                // Initialize the database context
                 var dbContext = serviceProvider.GetRequiredService<FishFarmDbContext>();
                 dbContext.Database.EnsureCreated();
-                AddTabWithPresenter<CageForm, ICageView, CagePresenter, CageService>(
-                    "Cages", serviceProvider);
 
-                AddTabWithPresenter<StockingForm, IStockingView, StockingPresenter, StockingService>(
-                    "Fish Stocking", serviceProvider);
+                // Register tab definitions
+                var tabs = new List<Action>
+        {
+            () => AddTab<CageForm, ICageView, CagePresenter, CageService>("Cages", serviceProvider),
+            () => AddTab<StockingForm, IStockingView, StockingPresenter, StockingService>("Fish Stocking", serviceProvider),
+            () => AddCustomTab(() => new MortalityForm(), "Fish Mortalities", view =>
+            {
+                var mortalityService = serviceProvider.GetRequiredService<MortalityService>();
+                var balanceService = serviceProvider.GetRequiredService<StockBalanceService>();
+                return new MortalityPresenter((IMortalityView)view, mortalityService, balanceService);
+            }),
+            () => AddCustomTab(() => new TransferForm(), "Fish Transfers", view =>
+            {
+                var transferService = serviceProvider.GetRequiredService<TransferService>();
+                var cageService = serviceProvider.GetRequiredService<CageService>();
+                return new TransferPresenter((ITransferView)view, transferService, cageService);
+            }),
+            () => AddTab<BalanceForm, IBalanceView, BalancePresenter>("Stock Balance", serviceProvider),
+            () => AddTab<MortalityPivotForm, IMortalityPivotView, MortalityPivotPresenter>("Mortality Pivot", serviceProvider)
+        };
 
-                AddMortalityTab(serviceProvider);
-
-                AddTransferTab(serviceProvider);
-
-                AddTabWithPresenter<BalanceForm, IBalanceView, BalancePresenter>(
-                    "Stock Balance", serviceProvider);
-
-                AddTabWithPresenter<MortalityPivotForm, IMortalityPivotView, MortalityPivotPresenter>(
-                    "Mortality Pivot", serviceProvider);
-
+                foreach (var tab in tabs)
+                    tab();
 
                 this.Controls.Add(_tabControl);
             }
@@ -64,105 +69,63 @@ namespace Apos_AquaProductManageApp
             }
         }
 
-        private void AddTabWithPresenter<TForm, TView, TPresenter, TService>(
-        string tabTitle, IServiceProvider serviceProvider)
-        where TForm : Form, TView, new()
-        where TPresenter : class
-        {
-            var form = new TForm
-            {
-                TopLevel = false,
-                FormBorderStyle = FormBorderStyle.None,
-                Dock = DockStyle.Fill
-            };
-
-            var view = (TView)form;
-            TService service = serviceProvider.GetRequiredService<TService>();
-
-            var presenterObj = Activator.CreateInstance(typeof(TPresenter), view, service);
-
-            if (presenterObj is not TPresenter presenter)
-            {
-                throw new InvalidOperationException($"Could not create instance of type {typeof(TPresenter).Name}.");
-            }
-
-
-            form.Show();
-
-            var tabPage = new TabPage(tabTitle);
-            tabPage.Controls.Add(form);
-            _tabControl.TabPages.Add(tabPage);
-        }
-
-        private void AddTabWithPresenter<TForm, TView, TPresenter>(
-    string tabTitle, IServiceProvider serviceProvider)
+        private void AddTab<TForm, TView, TPresenter, TService>(string title, IServiceProvider services)
     where TForm : Form, TView, new()
     where TPresenter : class
         {
-            var form = new TForm
-            {
-                TopLevel = false,
-                FormBorderStyle = FormBorderStyle.None,
-                Dock = DockStyle.Fill
-            };
-
+            var form = CreateForm<TForm>();
             var view = (TView)form;
-            TPresenter presenter = (TPresenter)ActivatorUtilities.CreateInstance(serviceProvider, typeof(TPresenter), view);
+            var service = services.GetRequiredService<TService>();
 
-            form.Show();
+            var presenter = Activator.CreateInstance(typeof(TPresenter), view, service);
+            if (presenter is not TPresenter)
+                throw new InvalidOperationException($"Failed to create presenter for {title}");
 
-            var tabPage = new TabPage(tabTitle);
-            tabPage.Controls.Add(form);
-            _tabControl.TabPages.Add(tabPage);
+            ShowFormInTab(form, title);
         }
 
-        private void AddMortalityTab(IServiceProvider serviceProvider)
+        private static TForm CreateForm<TForm>() where TForm : Form, new()
         {
-            var form = new MortalityForm
+            return new TForm
             {
                 TopLevel = false,
                 FormBorderStyle = FormBorderStyle.None,
                 Dock = DockStyle.Fill
             };
-
-            var view = (IMortalityView)form;
-            var mortalityService = serviceProvider.GetRequiredService<MortalityService>();
-            var balanceService = serviceProvider.GetRequiredService<StockBalanceService>();
-
-            var presenter = new MortalityPresenter(view, mortalityService, balanceService);
-
-            form.Show();
-            var tabPage = new TabPage("Fish Mortalities");
-            tabPage.Controls.Add(form);
-            _tabControl.TabPages.Add(tabPage);
         }
 
-        private void AddTransferTab(IServiceProvider serviceProvider)
+        private void ShowFormInTab(Form form, string title)
         {
-            var form = new TransferForm
-            {
-                TopLevel = false,
-                FormBorderStyle = FormBorderStyle.None,
-                Dock = DockStyle.Fill
-            };
-
-            var view = (ITransferView)form;
-
-            var transferService = serviceProvider.GetRequiredService<TransferService>();
-            var cageService = serviceProvider.GetRequiredService<CageService>();
-
-            var presenter = new TransferPresenter(view, transferService, cageService);
-
             form.Show();
-
-            var tabPage = new TabPage("Fish Transfers");
+            var tabPage = new TabPage(title);
             tabPage.Controls.Add(form);
             _tabControl.TabPages.Add(tabPage);
         }
 
 
+        private void AddCustomTab<TForm>(Func<TForm> formFactory, string title, Func<TForm, object> presenterFactory)
+    where TForm : Form
+        {
+            var form = formFactory();
+            form.TopLevel = false;
+            form.FormBorderStyle = FormBorderStyle.None;
+            form.Dock = DockStyle.Fill;
+
+            var presenter = presenterFactory(form);
+
+            ShowFormInTab(form, title);
+        }
 
 
+        private void AddTab<TForm, TView, TPresenter>(string title, IServiceProvider services)
+    where TForm : Form, TView, new()
+    where TPresenter : class
+        {
+            var form = CreateForm<TForm>();
+            var view = (TView)form;
+
+            var presenter = (TPresenter)ActivatorUtilities.CreateInstance(services, typeof(TPresenter), view);
+            ShowFormInTab(form, title);
+        }
     }
-
 }
