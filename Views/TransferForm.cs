@@ -22,12 +22,9 @@ namespace Apos_AquaProductManageApp
         {
             InitializeComponent();
             Utilities.InitializeFormSizeFromConfig(this, "TransferForm");
-            Initialize();
-            
+            Initialize();            
         }
-
       
-
         private void Initialize()
         {
             
@@ -41,9 +38,17 @@ namespace Apos_AquaProductManageApp
             transfersGrid.Dock = DockStyle.Top;
             transfersGrid.Height = 200;
             datePicker.Top = 210;
+            datePicker.Left = 10;
+            datePicker.Width = 230;
+            Label lblFrom = new Label { Text = "From Cage", Top = 240, Left = 10 };
             fromCageComboBox.Top = 240;
+            fromCageComboBox.Left = 120;
+            Label lblTo = new Label { Text = "To Cage", Top = 270, Left = 10 };
             toCageComboBox.Top = 270;
+            toCageComboBox.Left = 120;
+            Label lblQuantity = new Label { Text = "Set Quantity", Top = 300, Left = 10 };
             quantityNumeric.Top = 300;
+            quantityNumeric.Left = 120;
             addButton.Top = 330;
 
             datePicker.ValueChanged += (s, e) => _presenter.LoadData(SelectedDate);
@@ -54,10 +59,12 @@ namespace Apos_AquaProductManageApp
             Controls.Add(datePicker);
             Controls.Add(fromCageComboBox);
             Controls.Add(toCageComboBox);
+            Controls.Add(lblFrom);
+            Controls.Add(lblTo);
             Controls.Add(quantityNumeric);
+            Controls.Add(lblQuantity);
             Controls.Add(addButton);
         }
-
 
         public DateTime SelectedDate => datePicker.Value.Date;
 
