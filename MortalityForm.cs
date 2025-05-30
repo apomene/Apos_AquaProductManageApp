@@ -85,9 +85,16 @@ namespace Apos_AquaProductManageApp
             {
                 if (gridCages.SelectedRows.Count > 0)
                 {
-                    var cage = (Cage)gridCages.SelectedRows[0].DataBoundItem;
-                    int quantity = (int)numQuantity.Value;
-                    _presenter.AddOrUpdateMortality(cage.CageId, dtPicker.Value.Date, quantity);
+                    var selectedItem = gridCages.SelectedRows[0].DataBoundItem;
+                    if (selectedItem is Cage cage)
+                    {
+                        int quantity = (int)numQuantity.Value;
+                        _presenter.AddOrUpdateMortality(cage.CageId, dtPicker.Value.Date, quantity);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Invalid selection. Please select a valid cage.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
                 }
                 else
                 {

@@ -2,6 +2,7 @@
 using Apos_AquaProductManageApp.Presenters;
 using System.ComponentModel;
 using System.Configuration;
+using System.Security.Cryptography.Xml;
 using static Apos_AquaProductManageApp.Interfaces.ViewInterfaces;
 
 namespace Apos_AquaProductManageApp
@@ -84,8 +85,8 @@ namespace Apos_AquaProductManageApp
                 {
                     var fromCageColumn = transfersGrid.Columns?["FromCage"];
                     var toCageColumn = transfersGrid.Columns?["ToCage"];
-                    fromCageColumn.Visible = false;
-                    toCageColumn.Visible = false;
+                    fromCageColumn!.Visible = false;
+                    toCageColumn!.Visible = false;
                 }
             }
                
@@ -103,13 +104,20 @@ namespace Apos_AquaProductManageApp
         }
 
 
-        private void addButton_Click(object sender, EventArgs e)
+        private void addButton_Click(object? sender, EventArgs e)
         {
+            if (fromCageComboBox.SelectedItem is not Cage fromCage ||
+                toCageComboBox.SelectedItem is not Cage toCage)
+            {
+                MessageBox.Show("Please select both From and To cages.", "Input Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             var transfer = new FishTransfer
             {
-                FromCageId = ((Cage)fromCageComboBox.SelectedItem).CageId,
+                FromCageId = fromCage.CageId,
                 FromCage = (Cage)fromCageComboBox.SelectedItem,
-                ToCageId = ((Cage)toCageComboBox.SelectedItem).CageId,
+                ToCageId = toCage.CageId,
                 ToCage = (Cage)toCageComboBox.SelectedItem,
                 Quantity = (int)quantityNumeric.Value,
                 TransferDate = SelectedDate
@@ -124,6 +132,7 @@ namespace Apos_AquaProductManageApp
                 MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
     }
 
 }

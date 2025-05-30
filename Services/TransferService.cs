@@ -2,6 +2,7 @@
 using Apos_AquaProductManageApp.Model;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography.Xml;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Apos_AquaProductManageApp.Services
 {
@@ -15,26 +16,7 @@ namespace Apos_AquaProductManageApp.Services
             _context = context;
             _balanceService = balanceService;
         }
-
-        public void TransferFish(int fromCageId, int toCageId, DateTime date, int quantity)
-        {
-            int fromStock = _balanceService.GetStockBalance(fromCageId, date);
-            if (quantity > fromStock)
-                throw new InvalidOperationException("Transfer quantity exceeds available stock.");
-
-            _context.FishTransfers.Add(new FishTransfer
-            {
-                FromCageId = fromCageId,
-                FromCage = _context.Cages.Where(c => c.CageId == fromCageId).FirstOrDefault(),
-                ToCageId = toCageId,
-                ToCage = _context.Cages.Where(c => c.CageId == toCageId).FirstOrDefault(),
-                TransferDate = date,
-                Quantity = quantity
-            });
-
-            _context.SaveChanges();
-        }
-
+     
         public List<FishTransfer> GetTransfersByDate(DateTime date)
         {
             return _context.FishTransfers
@@ -46,6 +28,21 @@ namespace Apos_AquaProductManageApp.Services
 
         public void AddTransfer(FishTransfer transfer)
         {
+            int fromStock = _balanceService.GetStockBalance(transfer.FromCageId, transfer.TransferDate);
+            if (transfer.FromCageId == transfer.ToCageId)
+                throw new InvalidOperationException("Cannot transfer fish to the same cage.");
+            if (transfer.Quantity <= 0)
+                throw new InvalidOperationException("Transfer quantity must be greater than zero.");
+
+            if (transfer.Quantity > fromStock)
+                throw new InvalidOperationException("Transfer quantity exceeds available stock.");
+
+            var fromCage = _context.Cages.FirstOrDefault(c => c.CageId == transfer.FromCageId)
+                ?? throw new InvalidOperationException($"From cage with ID {transfer.FromCageId} not found.");
+
+            var toCage = _context.Cages.FirstOrDefault(c => c.CageId == transfer.ToCageId)
+                ?? throw new InvalidOperationException($"To cage with ID {transfer.ToCageId} not found.");
+
             var balance = CalculateBalance(transfer.FromCageId, transfer.TransferDate);
 
             if (balance < transfer.Quantity)
