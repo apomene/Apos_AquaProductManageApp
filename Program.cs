@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Apos_AquaProductManageApp.Presenters;
 using Apos_AquaProductManageApp.Services;
+using System.Configuration;
 
 namespace Apos_AquaProductManageApp
 {
@@ -16,9 +17,11 @@ namespace Apos_AquaProductManageApp
         {
             var services = new ServiceCollection();
 
+
+            string connectionString = ConfigurationManager.ConnectionStrings["FishFarmDb"].ConnectionString;
+
             services.AddDbContext<FishFarmDbContext>(options =>
-                options.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=FishFarmDB;Trusted_Connection=True;TrustServerCertificate=True;"));
-            services.AddTransient<CageService>();
+                options.UseSqlServer(connectionString)); services.AddTransient<CageService>();
             services.AddTransient<StockingService>();
             services.AddTransient<MortalityService>();
             services.AddTransient<StockBalanceService>();
