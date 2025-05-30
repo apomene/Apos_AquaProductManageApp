@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using static Apos_AquaProductManageApp.Interfaces.ViewInterfaces;
 using Apos_AquaProductManageApp.Services;
 using System.Configuration;
+using Apos_AquaProductManageApp.Views;
 
 
 
@@ -48,6 +49,11 @@ namespace Apos_AquaProductManageApp
 
                 AddTransferTab(serviceProvider);
 
+                AddTabWithPresenter<BalanceForm, IBalanceView, BalancePresenter>(
+                    "Stock Balance", serviceProvider);
+
+                AddTabWithPresenter<MortalityPivotForm, IMortalityPivotView, MortalityPivotPresenter>(
+                    "Mortality Pivot", serviceProvider);
 
 
                 this.Controls.Add(_tabControl);
@@ -80,6 +86,28 @@ namespace Apos_AquaProductManageApp
                 throw new InvalidOperationException($"Could not create instance of type {typeof(TPresenter).Name}.");
             }
 
+
+            form.Show();
+
+            var tabPage = new TabPage(tabTitle);
+            tabPage.Controls.Add(form);
+            _tabControl.TabPages.Add(tabPage);
+        }
+
+        private void AddTabWithPresenter<TForm, TView, TPresenter>(
+    string tabTitle, IServiceProvider serviceProvider)
+    where TForm : Form, TView, new()
+    where TPresenter : class
+        {
+            var form = new TForm
+            {
+                TopLevel = false,
+                FormBorderStyle = FormBorderStyle.None,
+                Dock = DockStyle.Fill
+            };
+
+            var view = (TView)form;
+            TPresenter presenter = (TPresenter)ActivatorUtilities.CreateInstance(serviceProvider, typeof(TPresenter), view);
 
             form.Show();
 

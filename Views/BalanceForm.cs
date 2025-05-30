@@ -1,6 +1,6 @@
 ﻿using Apos_AquaProductManageApp.Model;
 using Apos_AquaProductManageApp.Presenters;
-
+using System.Configuration;
 using static Apos_AquaProductManageApp.Interfaces.ViewInterfaces;
 
 namespace Apos_AquaProductManageApp.Views
@@ -14,7 +14,16 @@ namespace Apos_AquaProductManageApp.Views
         public BalanceForm()
         {
             InitializeComponent();
+            InitializeSizeFromConfig();
             Initialize();
+        }
+
+        private void InitializeSizeFromConfig()
+        {
+            if (int.TryParse(ConfigurationManager.AppSettings["BalanceForm.Width"], out int width))
+                this.Width = width;
+            if (int.TryParse(ConfigurationManager.AppSettings["BalanceForm.Height"], out int height))
+                this.Height = height;
         }
 
         private void Initialize()
