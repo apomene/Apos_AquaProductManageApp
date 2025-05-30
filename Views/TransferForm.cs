@@ -36,20 +36,20 @@ namespace Apos_AquaProductManageApp
             addButton = new Button { Text = "Add Transfer" };
 
             transfersGrid.Dock = DockStyle.Top;
-            transfersGrid.Height = 200;
-            datePicker.Top = 210;
+            transfersGrid.Height = 250;
+            datePicker.Top = 300;
             datePicker.Left = 10;
             datePicker.Width = 230;
-            Label lblFrom = new Label { Text = "From Cage", Top = 240, Left = 10 };
-            fromCageComboBox.Top = 240;
+            Label lblFrom = new Label { Text = "From Cage", Top = 330, Left = 10 };
+            fromCageComboBox.Top = 330;
             fromCageComboBox.Left = 120;
-            Label lblTo = new Label { Text = "To Cage", Top = 270, Left = 10 };
-            toCageComboBox.Top = 270;
+            Label lblTo = new Label { Text = "To Cage", Top = 360, Left = 10 };
+            toCageComboBox.Top = 360;
             toCageComboBox.Left = 120;
-            Label lblQuantity = new Label { Text = "Set Quantity", Top = 300, Left = 10 };
-            quantityNumeric.Top = 300;
+            Label lblQuantity = new Label { Text = "Set Quantity", Top = 390, Left = 10 };
+            quantityNumeric.Top = 390;
             quantityNumeric.Left = 120;
-            addButton.Top = 330;
+            addButton.Top = 420;
 
             datePicker.ValueChanged += (s, e) => _presenter.LoadData(SelectedDate);
             addButton.Click += addButton_Click;

@@ -36,7 +36,7 @@ namespace Apos_AquaProductManageApp
                 Top = 40,
                 Left = 10,
                 Width = 380,
-                Height = 150,
+                Height = 220,
                 AutoGenerateColumns = true,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect
             };
@@ -46,14 +46,14 @@ namespace Apos_AquaProductManageApp
                 Top = 40,
                 Left = 400,
                 Width = 380,
-                Height = 150,
+                Height = 220,
                 AutoGenerateColumns = true,
                 ReadOnly = true
             };
 
             numQuantity = new NumericUpDown
             {
-                Top = 210,
+                Top = 320,
                 Left = 10,
                 Width = 100,
                 Minimum = 1,
@@ -63,7 +63,7 @@ namespace Apos_AquaProductManageApp
             btnAdd = new Button
             {
                 Text = "Add / Update",
-                Top = 210,
+                Top = 320,
                 Left = 120,
                 Width = 100
             };

@@ -51,6 +51,12 @@ namespace Apos_AquaProductManageApp.Views
 
             Utilities.BindDataSource(gridBalances, balances, "Cage");
         }
+
+        public void RefreshBalance()
+        {
+            _presenter.LoadBalances(datePicker.Value.Date);
+        }
+
     }
 
 }
