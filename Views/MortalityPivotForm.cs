@@ -1,7 +1,6 @@
 ﻿using Apos_AquaProductManageApp.Model;
 using Apos_AquaProductManageApp.Presenters;
 using static Apos_AquaProductManageApp.Interfaces.ViewInterfaces;
-using static Apos_AquaProductManageApp.Services.TransferService;
 
 namespace Apos_AquaProductManageApp.Views
 {
@@ -27,7 +26,7 @@ namespace Apos_AquaProductManageApp.Views
             {
                 Name = "chkCage",
                 Text = "Cage",
-                Location = new Point(20, 380),
+                Location = new Point(20, 410),
                 AutoSize = true,
                 Checked = true
             };
@@ -36,7 +35,7 @@ namespace Apos_AquaProductManageApp.Views
             {
                 Name = "chkYear",
                 Text = "Year",
-                Location = new Point(20, 410),
+                Location = new Point(20, 430),
                 AutoSize = true,
                 Checked = true
             };
@@ -45,7 +44,7 @@ namespace Apos_AquaProductManageApp.Views
             {
                 Name = "chkMonth",
                 Text = "Month",
-                Location = new Point(20, 440),
+                Location = new Point(20, 450),
                 AutoSize = true,
                 Checked = true
             };
@@ -63,7 +62,7 @@ namespace Apos_AquaProductManageApp.Views
 
             gridPivot = new DataGridView {  ReadOnly = true, AutoGenerateColumns = true };
             gridPivot.Width = 550;
-            gridPivot.Height = 300;
+            gridPivot.Height = 400;
             Controls.Add(gridPivot);
         }
 
@@ -72,7 +71,7 @@ namespace Apos_AquaProductManageApp.Views
             _presenter = presenter;
         }
 
-        public void DisplayPivot(List<MortalityPivot> pivot)
+        public void DisplayMortalityPivot(List<MortalityPivot> pivot)
         {
             gridPivot.DataSource = pivot;
         }
@@ -87,6 +86,7 @@ namespace Apos_AquaProductManageApp.Views
 
             return dimensions;
         }
+
 
         private void LoadPivot_Click(object sender, EventArgs e)
         {

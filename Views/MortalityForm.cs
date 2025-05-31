@@ -1,5 +1,6 @@
 ﻿using Apos_AquaProductManageApp.Model;
 using Apos_AquaProductManageApp.Presenters;
+using Apos_AquaProductManageApp.Services;
 using Apos_AquaProductManageApp.Views;
 using System.Configuration;
 using System.Data;
@@ -16,16 +17,33 @@ namespace Apos_AquaProductManageApp
         private NumericUpDown numQuantity = null!;
         private Button btnAdd = null!;
         private Button btnDeleteMortality = null!;
+        private readonly TransferService _transferService;
 
 
-        public MortalityForm() 
+        public MortalityForm( TransferService transferService) 
         { 
             InitializeComponent();
+            _transferService = transferService;
             Utilities.InitializeFormSizeFromConfig(this, "MortalityForm");
             Initialize();
+            SetUpGrid();
             SetUpDeleteButton();
         }
-     
+
+        private void SetUpGrid()
+        {
+
+            gridMortalities.ScrollBars = ScrollBars.Vertical;
+
+            gridMortalities.ReadOnly = false;
+            gridMortalities.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            gridMortalities.AllowUserToAddRows = false;
+            gridMortalities.AllowUserToDeleteRows = true;
+            gridMortalities.EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
+            gridMortalities.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            gridMortalities.CellValidating += grid_CellValidating;
+        }
+
         private void Initialize()
         {
             this.Text = "Mortality Registration";
@@ -71,25 +89,32 @@ namespace Apos_AquaProductManageApp
             };
             btnAdd.Click += (s, e) =>
             {
-                if (gridCages.SelectedRows.Count > 0)
+                try
                 {
-                    var selectedItem = gridCages.SelectedRows[0].DataBoundItem;
-                    if (selectedItem is Cage cage)
+                    if (gridCages.SelectedRows.Count > 0)
                     {
-                        int quantity = (int)numQuantity.Value;
-                        _presenter.AddOrUpdateMortality(cage.CageId, dtPicker.Value.Date, quantity);
+                        var selectedItem = gridCages.SelectedRows[0].DataBoundItem;
+                        if (selectedItem is Cage cage)
+                        {
+                            int quantity = (int)numQuantity.Value;
+                            _presenter.AddOrUpdateMortality(cage.CageId, dtPicker.Value.Date, quantity);
+                        }
+                        else
+                        {
+                            MessageBox.Show("Invalid selection. Please select a valid cage.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        }
                     }
                     else
                     {
-                        MessageBox.Show("Invalid selection. Please select a valid cage.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    }
-                }
-                else
+                        MessageBox.Show("Select a cage first.");
+                    }            
+            }
+                catch (Exception ex)
                 {
-                    MessageBox.Show("Select a cage first.");
+                    MessageBox.Show($"failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-            };
 
+            };
             this.Controls.Add(dtPicker);
             this.Controls.Add(gridCages);
             this.Controls.Add(gridMortalities);
@@ -111,6 +136,34 @@ namespace Apos_AquaProductManageApp
             btnDeleteMortality.Click += BtnDeleteMortality_Click;
             this.Controls.Add(btnDeleteMortality);
         }
+
+        private void grid_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
+        {
+            var grid = (DataGridView)sender;
+
+            if (grid.Columns[e.ColumnIndex].Name == "Quantity")
+            {
+                if (int.TryParse(e.FormattedValue?.ToString(), out int newQuantity))
+                {
+                    var selection = (Mortality)grid.Rows[e.RowIndex].DataBoundItem;
+
+                    int balance = _transferService.CalculateBalance(selection.CageId, selection.MortalityDate);
+
+                    int maxAllowed = balance + selection.Quantity;
+
+                    if (newQuantity > maxAllowed)
+                    {
+                        MessageBox.Show(
+                            $"This update would exceed the available fish stock. Max allowed: {maxAllowed}",
+                            "Invalid Operation",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning);
+                        e.Cancel = true;
+                    }
+                }
+            }
+        }
+
 
         private void BtnDeleteMortality_Click(object sender, EventArgs e)
         {

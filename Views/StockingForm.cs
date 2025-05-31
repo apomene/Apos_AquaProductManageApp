@@ -1,5 +1,6 @@
 ﻿using Apos_AquaProductManageApp.Model;
 using Apos_AquaProductManageApp.Presenters;
+using Apos_AquaProductManageApp.Services;
 using Apos_AquaProductManageApp.Views;
 using static Apos_AquaProductManageApp.Interfaces.ViewInterfaces;
 
@@ -14,10 +15,13 @@ namespace Apos_AquaProductManageApp
         private Button btnAdd = null!;
         private Button btnUPdate = null!;
         private Button btnDelete = null!;
+        private readonly TransferService _transferService;
 
-        public StockingForm()
+
+        public StockingForm(TransferService transferService)
         {
             InitializeComponent();
+            _transferService = transferService;
             Utilities.InitializeFormSizeFromConfig(this, "StockingForm");
             Initialize();
         }
@@ -63,7 +67,7 @@ namespace Apos_AquaProductManageApp
             gridStocked.AllowUserToDeleteRows = true;
             gridStocked.EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
             gridStocked.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-
+            gridStocked.CellValidating += gridStocking_CellValidating;
         }
 
         private void SetUpButtons()
@@ -105,6 +109,30 @@ namespace Apos_AquaProductManageApp
             this.Controls.Add(btnDelete);
         }
 
+        private void gridStocking_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
+        {
+            var grid = (DataGridView)sender;
+
+            // Get the column being edited (e.g., "Quantity")
+            if (grid.Columns[e.ColumnIndex].Name == "Quantity")
+            {
+                if (int.TryParse(e.FormattedValue.ToString(), out int newQuantity))
+                {
+                    var stocking = (FishStocking)grid.Rows[e.RowIndex].DataBoundItem;
+
+                    // Simulate balance if this change were applied
+                    int simulatedBalance = _transferService.CalculateBalance(stocking.CageId, stocking.StockingDate) - stocking.Quantity + newQuantity;
+
+                    if (simulatedBalance < 0)
+                    {
+                        MessageBox.Show("This update would result in a negative stock balance.", "Invalid Operation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        e.Cancel = true; // Cancel the edit
+                    }
+                }
+            }
+        }
+
+
         private void BtnUpdateStocking_Click(object sender, EventArgs e)
         {
             if (gridStocked.SelectedRows.Count == 0)
@@ -122,11 +150,15 @@ namespace Apos_AquaProductManageApp
                     try
                     {
                         _presenter.UpdateStocking(selected);
-                        _presenter.LoadStockingData(dtPicker.Value.Date);
+                        
                     }
                     catch (Exception ex)
                     {
                         MessageBox.Show($"Update failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    finally
+                    {
+                        _presenter.LoadStockingData(dtPicker.Value.Date);
                     }
                 }
             }

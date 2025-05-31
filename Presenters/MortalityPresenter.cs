@@ -29,13 +29,7 @@ namespace Apos_AquaProductManageApp.Presenters
 
         public void AddOrUpdateMortality(int cageId, DateTime date, int quantity)
         {
-            int availableStock = _balanceService.GetStockBalance(cageId, date);
-            if (quantity > availableStock)
-            {
-                MessageBox.Show($"Cannot register mortality: available stock is {availableStock}.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
+           
             _mortalityService.AddOrUpdateMortality(cageId, date, quantity);
             LoadData(date);
         }

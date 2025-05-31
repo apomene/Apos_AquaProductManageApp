@@ -11,6 +11,7 @@ namespace Apos_AquaProductManageApp.DBContext
         public DbSet<Cage> Cages { get; set; }
         public DbSet<FishStocking> FishStockings { get; set; }
         public DbSet<Mortality> Mortalities { get; set; }
+
         public DbSet<FishTransfer> FishTransfers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

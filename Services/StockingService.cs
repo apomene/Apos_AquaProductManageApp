@@ -9,11 +9,13 @@ namespace Apos_AquaProductManageApp.Services
     {
         private readonly FishFarmDbContext _db;
         private readonly StockBalanceService _balanceService;
+        private readonly TransferService _transferService;
 
-        public StockingService(FishFarmDbContext db, StockBalanceService balanceService)
+        public StockingService(FishFarmDbContext db, StockBalanceService balanceService, TransferService transferService)
         {
             _db = db;
             _balanceService = balanceService;
+            _transferService = transferService;
         }
 
         public List<FishStocking> GetStockingsByDate(DateTime date)
@@ -40,12 +42,25 @@ namespace Apos_AquaProductManageApp.Services
 
         public void UpdateStocking(FishStocking stocking)
         {
+            var currentStocking = _db.FishStockings.First(s => s.StockingId == stocking.StockingId);
+
+            var balanceBefore = _transferService.CalculateBalance(stocking.CageId, stocking.StockingDate);
+
+            if (balanceBefore > currentStocking.Quantity)
+                throw new InvalidOperationException("Deleting this stocking would result in negative stock.");
             _db.FishStockings.Update(stocking);
             _db.SaveChanges();
         }
 
         public void DeleteStocking(FishStocking stocking)
         {
+            var currentStocking = _db.FishStockings.First(s => s.StockingId == stocking.StockingId);
+
+            var balanceBefore = _transferService.CalculateBalance(stocking.CageId, stocking.StockingDate);
+
+            if (balanceBefore < currentStocking.Quantity)
+                throw new InvalidOperationException("Deleting this stocking would result in negative stock.");
+
             _db.FishStockings.Remove(stocking);
             _db.SaveChanges();
         }

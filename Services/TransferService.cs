@@ -7,40 +7,23 @@ namespace Apos_AquaProductManageApp.Services
     public class TransferService
     {
         private readonly FishFarmDbContext _context;
-        private readonly StockBalanceService _balanceService;
 
-        public TransferService(FishFarmDbContext context, StockBalanceService balanceService)
+        public TransferService(FishFarmDbContext context)
         {
             _context = context;
-            _balanceService = balanceService;
         }
-     
+
         public List<FishTransfer> GetTransfersByDate(DateTime date)
         {
             return _context.FishTransfers
                 .Where(t => t.TransferDate.Date == date.Date)
                 .Include(t => t.FromCage)
-            .Include(t => t.ToCage)
-                .ToList();
+                .Include(t => t.ToCage)
+            .ToList();
         }
 
         public void AddTransfer(FishTransfer transfer)
         {
-            int fromStock = _balanceService.GetStockBalance(transfer.FromCageId, transfer.TransferDate);
-            if (transfer.FromCageId == transfer.ToCageId)
-                throw new InvalidOperationException("Cannot transfer fish to the same cage.");
-            if (transfer.Quantity <= 0)
-                throw new InvalidOperationException("Transfer quantity must be greater than zero.");
-
-            if (transfer.Quantity > fromStock)
-                throw new InvalidOperationException("Transfer quantity exceeds available stock.");
-
-            var fromCage = _context.Cages.FirstOrDefault(c => c.CageId == transfer.FromCageId)
-                ?? throw new InvalidOperationException($"From cage with ID {transfer.FromCageId} not found.");
-
-            var toCage = _context.Cages.FirstOrDefault(c => c.CageId == transfer.ToCageId)
-                ?? throw new InvalidOperationException($"To cage with ID {transfer.ToCageId} not found.");
-
             var balance = CalculateBalance(transfer.FromCageId, transfer.TransferDate);
 
             if (balance < transfer.Quantity)
@@ -71,9 +54,11 @@ namespace Apos_AquaProductManageApp.Services
             return stocked - dead - transfersOut + transfersIn;
         }
 
+
         public List<StockBalance> GetDailyBalances(DateTime date)
         {
             var cages = _context.Cages.ToList();
+
             return cages.Select(cage => new StockBalance
             {
                 Cage = cage,
@@ -81,36 +66,31 @@ namespace Apos_AquaProductManageApp.Services
             }).ToList();
         }
 
-        public enum MortalityDimension
+           public List<MortalityPivot> GetMortalityPivot(List<MortalityDimension> dimensions)
         {
-            Cage,
-            Year,
-            Month
-        }
+            var mortalityData = _context.Mortalities
+                .Include(m => m.Cage)  
+                .ToList();             
 
-        public List<MortalityPivot> GetMortalityPivot(List<MortalityDimension> dimensions)
-        {
-            var mortalities = _context.Mortalities.AsQueryable();
+            var grouped = mortalityData.GroupBy(m =>
+            {
+                var key = new MortalityPivotKey();
+                if (dimensions.Contains(MortalityDimension.Cage))
+                    key.CageId = m.CageId;
+                if (dimensions.Contains(MortalityDimension.Year))
+                    key.Year = m.MortalityDate.Year;
+                if (dimensions.Contains(MortalityDimension.Month))
+                    key.Month = m.MortalityDate.Month;
+                return key;
+            });
 
-            // Dynamic grouping
-            var grouped = mortalities.GroupBy(m =>
-                new
-                {
-                    CageId = dimensions.Contains(MortalityDimension.Cage) ? m.CageId : (int?)null,
-                    Year = dimensions.Contains(MortalityDimension.Year) ? m.MortalityDate.Year : (int?)null,
-                    Month = dimensions.Contains(MortalityDimension.Month) ? m.MortalityDate.Month : (int?)null
-                }
-            );
-
-            var result = grouped.Select(g => new MortalityPivot
+            return grouped.Select(g => new MortalityPivot
             {
                 CageId = g.Key.CageId,
                 Year = g.Key.Year,
                 Month = g.Key.Month,
-                TotalMortalities = g.Sum(x => x.Quantity)
-            });
-
-            return result.ToList();
+                TotalMortalities = g.Sum(m => m.Quantity)
+            }).ToList();
         }
 
     }
