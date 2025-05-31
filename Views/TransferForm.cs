@@ -11,6 +11,8 @@ namespace Apos_AquaProductManageApp
         private TransferPresenter _presenter = null!;
 
         private DataGridView transfersGrid = null!;
+    
+
         private DateTimePicker datePicker = null!;
         private ComboBox fromCageComboBox = null!;
         private ComboBox toCageComboBox = null!;
@@ -22,9 +24,10 @@ namespace Apos_AquaProductManageApp
         {
             InitializeComponent();
             Utilities.InitializeFormSizeFromConfig(this, "TransferForm");
-            Initialize();            
+            Initialize();
         }
-      
+
+
         private void Initialize()
         {
             
@@ -36,20 +39,22 @@ namespace Apos_AquaProductManageApp
             addButton = new Button { Text = "Add Transfer" };
 
             transfersGrid.Dock = DockStyle.Top;
-            transfersGrid.Height = 250;
-            datePicker.Top = 300;
+            transfersGrid.Top = 10;
+            transfersGrid.Height = 380;
+            datePicker.Top = 400;
             datePicker.Left = 10;
             datePicker.Width = 230;
-            Label lblFrom = new Label { Text = "From Cage", Top = 330, Left = 10 };
-            fromCageComboBox.Top = 330;
+            Label lblFrom = new Label { Text = "From Cage", Top = 430, Left = 10 };
+            fromCageComboBox.Top = 430;
             fromCageComboBox.Left = 120;
-            Label lblTo = new Label { Text = "To Cage", Top = 360, Left = 10 };
-            toCageComboBox.Top = 360;
+            Label lblTo = new Label { Text = "To Cage", Top = 460, Left = 10 };
+            toCageComboBox.Top = 460;
             toCageComboBox.Left = 120;
-            Label lblQuantity = new Label { Text = "Set Quantity", Top = 390, Left = 10 };
-            quantityNumeric.Top = 390;
+            Label lblQuantity = new Label { Text = "Set Quantity", Top = 490, Left = 10 };
+            quantityNumeric.Top = 490;
             quantityNumeric.Left = 120;
-            addButton.Top = 420;
+            addButton.Top = 400;
+            addButton.Left = 300;
 
             datePicker.ValueChanged += (s, e) => _presenter.LoadData(SelectedDate);
             addButton.Click += addButton_Click;
@@ -118,7 +123,7 @@ namespace Apos_AquaProductManageApp
             {
                 MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }
+        }      
 
     }
 

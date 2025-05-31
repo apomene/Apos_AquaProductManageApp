@@ -9,11 +9,13 @@ namespace Apos_AquaProductManageApp.Services
     {
         private readonly FishFarmDbContext _db;
         private readonly StockBalanceService _balanceService;
+        private readonly TransferService _transferService;
 
-        public MortalityService(FishFarmDbContext db, StockBalanceService balanceService)
+        public MortalityService(FishFarmDbContext db, StockBalanceService balanceService, TransferService transferService)
         {
             _db = db;
             _balanceService = balanceService;
+            _transferService = transferService;
         }
 
         public List<Cage> GetCagesEligibleForMortality(DateTime date)
@@ -39,27 +41,45 @@ namespace Apos_AquaProductManageApp.Services
         public void AddOrUpdateMortality(int cageId, DateTime date, int quantity)
         {
             var existing = _db.Mortalities.FirstOrDefault(m => m.CageId == cageId && m.MortalityDate == date);
+            var balanceBefore = _transferService.CalculateBalance(cageId, date);
 
             if (existing != null)
             {
+                int delta = quantity - existing.Quantity;
+                if (delta > 0 && delta > balanceBefore)
+                    throw new InvalidOperationException("Updated mortality exceeds available stock.");
+
                 existing.Quantity = quantity;
             }
             else
             {
+                if (quantity > balanceBefore)
+                    throw new InvalidOperationException("Mortality exceeds available stock.");
+
                 _db.Mortalities.Add(new Mortality { CageId = cageId, MortalityDate = date, Quantity = quantity });
             }
 
             _db.SaveChanges();
         }
 
+
         public void UpdateMortality(Mortality mortality)
         {
+            var existing = _db.Mortalities.First(m => m.MortalityId == mortality.MortalityId);
+
+            // Temporarily subtract the original value to simulate a "reset"
+            var balanceBefore = _transferService.CalculateBalance(mortality.CageId, mortality.MortalityDate) + existing.Quantity;
+
+            if (balanceBefore < mortality.Quantity)
+                throw new InvalidOperationException("Updated mortality would cause negative stock balance.");
+
             _db.Mortalities.Update(mortality);
             _db.SaveChanges();
         }
 
         public void DeleteMortality(Mortality mortality)
         {
+
             _db.Mortalities.Remove(mortality);
             _db.SaveChanges();
         }

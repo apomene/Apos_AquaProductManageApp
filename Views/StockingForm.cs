@@ -1,5 +1,6 @@
 ﻿using Apos_AquaProductManageApp.Model;
 using Apos_AquaProductManageApp.Presenters;
+using Apos_AquaProductManageApp.Services;
 using Apos_AquaProductManageApp.Views;
 using static Apos_AquaProductManageApp.Interfaces.ViewInterfaces;
 
@@ -14,10 +15,13 @@ namespace Apos_AquaProductManageApp
         private Button btnAdd = null!;
         private Button btnUPdate = null!;
         private Button btnDelete = null!;
+        private readonly TransferService _transferService;
 
-        public StockingForm()
+
+        public StockingForm(TransferService transferService)
         {
             InitializeComponent();
+            _transferService = transferService;
             Utilities.InitializeFormSizeFromConfig(this, "StockingForm");
             Initialize();
         }
@@ -63,7 +67,7 @@ namespace Apos_AquaProductManageApp
             gridStocked.AllowUserToDeleteRows = true;
             gridStocked.EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
             gridStocked.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-
+            gridStocked.CellValidating += gridStocking_CellValidating;
         }
 
         private void SetUpButtons()
@@ -105,45 +109,103 @@ namespace Apos_AquaProductManageApp
             this.Controls.Add(btnDelete);
         }
 
-        private void HandleStockingAction(string actionType)
+        private void gridStocking_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
         {
-            if (gridStocked.SelectedRows.Count == 0)
-            {
-                MessageBox.Show($"Please select a row to {actionType.ToLower()}.");
-                return;
-            }
+            var grid = (DataGridView)sender;
 
-            var selected = gridStocked.SelectedRows[0].DataBoundItem as FishStocking;
-
-            if (selected != null)
+            // Get the column being edited (e.g., "Quantity")
+            if (grid.Columns[e.ColumnIndex].Name == "Quantity")
             {
-                var confirm = MessageBox.Show($"Are you sure you want to {actionType.ToLower()} this entry?", "Confirm", MessageBoxButtons.YesNo);
-                if (confirm == DialogResult.Yes)
+                if (int.TryParse(e.FormattedValue.ToString(), out int newQuantity))
                 {
-                    try
-                    {
-                        if (actionType == "Update")
-                            _presenter.UpdateStocking(selected);
-                        else if (actionType == "Delete")
-                            _presenter.DeleteStocking(selected);
+                    var stocking = (FishStocking)grid.Rows[e.RowIndex].DataBoundItem;
 
-                        _presenter.LoadStockingData(dtPicker.Value.Date);
-                    }
-                    catch (Exception ex)
+                    // Simulate balance if this change were applied
+                    int simulatedBalance = _transferService.CalculateBalance(stocking.CageId, stocking.StockingDate) - stocking.Quantity + newQuantity;
+
+                    if (simulatedBalance < 0)
                     {
-                        MessageBox.Show($"{actionType} failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("This update would result in a negative stock balance.", "Invalid Operation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        e.Cancel = true; // Cancel the edit
                     }
                 }
             }
         }
+
+
         private void BtnUpdateStocking_Click(object sender, EventArgs e)
         {
-            HandleStockingAction("Update");
+            if (gridStocked.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Please select a row to update.");
+                return;
+            }
+            var selected = gridStocked.SelectedRows[0].DataBoundItem as FishStocking;
+
+            if (selected != null)
+            {
+                var confirm = MessageBox.Show("Are you sure you want to update this entry?", "Confirm", MessageBoxButtons.YesNo);
+                if (confirm == DialogResult.Yes)
+                {
+                    try
+                    {
+                        _presenter.UpdateStocking(selected);
+                        
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Update failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    finally
+                    {
+                        _presenter.LoadStockingData(dtPicker.Value.Date);
+                    }
+                }
+            }
         }
 
         private void BtnDeleteStocking_Click(object sender, EventArgs e)
         {
-            HandleStockingAction("Delete");
+            if (gridStocked.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Please select a row to delete.");
+                return;
+            }
+            var selected= gridStocked.SelectedRows[0].DataBoundItem as FishStocking;
+
+            if (selected != null)
+            {
+                var confirm = MessageBox.Show("Are you sure you want to delete this entry?", "Confirm", MessageBoxButtons.YesNo);
+                if (confirm == DialogResult.Yes)
+                {
+                    try
+                    {
+                        _presenter.DeleteStocking(selected);
+                        _presenter.LoadStockingData(dtPicker.Value.Date);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Deletion failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+        }
+
+
+        private void DataGridView_UserDeletingRow(object sender, DataGridViewRowCancelEventArgs e)
+        {
+            if (e.Row.DataBoundItem is FishStocking stockingToDelete)
+            {
+                try
+                {
+                    _presenter.DeleteStocking(stockingToDelete);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Deletion failed: {ex.Message}");
+                    e.Cancel = true;
+                }
+            }
         }
 
 

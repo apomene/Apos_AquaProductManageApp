@@ -22,7 +22,7 @@ namespace Apos_AquaProductManageApp
             Utilities.InitializeFormSizeFromConfig(this, "MainWindow");
             Initialize(serviceProvider);
         }
-       
+
 
         private void Initialize(IServiceProvider serviceProvider)
         {
@@ -61,8 +61,14 @@ namespace Apos_AquaProductManageApp
                 var tabs = new List<Action>
         {
             () => AddTab<CageForm, ICageView, CagePresenter, CageService>("Cages", serviceProvider),
-            () => _fishStockingTab = AddTab<StockingForm, IStockingView, StockingPresenter, StockingService>("Fish Stocking", serviceProvider),
-            () => AddCustomTab(() => new MortalityForm(), "Fish Mortalities", view =>
+              ()=>  _fishStockingTab = AddTab<StockingForm, IStockingView, StockingPresenter, StockingService>(
+               "Fish Stocking",
+               serviceProvider,
+               () => new StockingForm(serviceProvider.GetRequiredService<TransferService>()),
+               form => new StockingPresenter(
+                   (IStockingView)form,
+                   serviceProvider.GetRequiredService<StockingService>())),
+            () => AddCustomTab(() => new MortalityForm(serviceProvider.GetRequiredService<TransferService>()), "Fish Mortalities", view =>
             {
                 var mortalityService = serviceProvider.GetRequiredService<MortalityService>();
                 var balanceService = serviceProvider.GetRequiredService<StockBalanceService>();
@@ -76,8 +82,9 @@ namespace Apos_AquaProductManageApp
             }),
             () => _stockBalanceTab = AddTab<BalanceForm, IBalanceView, BalancePresenter>("Stock Balance", serviceProvider),
             () => AddTab<MortalityPivotForm, IMortalityPivotView, MortalityPivotPresenter>("Mortality Pivot", serviceProvider)
+                
         };
-
+              
                 foreach (var tab in tabs)
                     tab();
 
@@ -88,6 +95,31 @@ namespace Apos_AquaProductManageApp
                 MessageBox.Show($"Error initializing database: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        private TabPage AddTab<TForm, TView, TPresenter, TService>(
+      string title,
+      IServiceProvider serviceProvider,
+      Func<TForm> formFactory,
+      Func<TForm, TPresenter> presenterFactory)
+      where TForm : Form
+        {
+            // Create the form using the factory
+            TForm form = formFactory();
+
+            TPresenter presenter = presenterFactory(form);
+
+            TabPage tabPage = new TabPage(title);
+            form.TopLevel = false;         
+            form.FormBorderStyle = FormBorderStyle.None;
+            form.Dock = DockStyle.Fill;
+            tabPage.Controls.Add(form);
+            form.Show();
+
+            _tabControl.TabPages.Add(tabPage);
+
+            return tabPage;
+        }
+
 
         private TabPage AddTab<TForm, TView, TPresenter, TService>(string title, IServiceProvider services)
      where TForm : Form, TView, new()
@@ -150,4 +182,5 @@ namespace Apos_AquaProductManageApp
             return ShowFormInTab(form, title);
         }
     }
+
 }

@@ -40,4 +40,3 @@ CREATE TABLE FishTransfers (
 );
 GO
 
-

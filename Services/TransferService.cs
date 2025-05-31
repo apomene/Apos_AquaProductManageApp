@@ -14,7 +14,7 @@ namespace Apos_AquaProductManageApp.Services
             _context = context;
             _balanceService = balanceService;
         }
-     
+
         public List<FishTransfer> GetTransfersByDate(DateTime date)
         {
             return _context.FishTransfers
@@ -71,9 +71,11 @@ namespace Apos_AquaProductManageApp.Services
             return stocked - dead - transfersOut + transfersIn;
         }
 
+
         public List<StockBalance> GetDailyBalances(DateTime date)
         {
             var cages = _context.Cages.ToList();
+
             return cages.Select(cage => new StockBalance
             {
                 Cage = cage,
@@ -81,36 +83,31 @@ namespace Apos_AquaProductManageApp.Services
             }).ToList();
         }
 
-        public enum MortalityDimension
+           public List<MortalityPivot> GetMortalityPivot(List<MortalityDimension> dimensions)
         {
-            Cage,
-            Year,
-            Month
-        }
+            var mortalityData = _context.Mortalities
+                .Include(m => m.Cage)  
+                .ToList();             
 
-        public List<MortalityPivot> GetMortalityPivot(List<MortalityDimension> dimensions)
-        {
-            var mortalities = _context.Mortalities.AsQueryable();
+            var grouped = mortalityData.GroupBy(m =>
+            {
+                var key = new MortalityPivotKey();
+                if (dimensions.Contains(MortalityDimension.Cage))
+                    key.CageId = m.CageId;
+                if (dimensions.Contains(MortalityDimension.Year))
+                    key.Year = m.MortalityDate.Year;
+                if (dimensions.Contains(MortalityDimension.Month))
+                    key.Month = m.MortalityDate.Month;
+                return key;
+            });
 
-            // Dynamic grouping
-            var grouped = mortalities.GroupBy(m =>
-                new
-                {
-                    CageId = dimensions.Contains(MortalityDimension.Cage) ? m.CageId : (int?)null,
-                    Year = dimensions.Contains(MortalityDimension.Year) ? m.MortalityDate.Year : (int?)null,
-                    Month = dimensions.Contains(MortalityDimension.Month) ? m.MortalityDate.Month : (int?)null
-                }
-            );
-
-            var result = grouped.Select(g => new MortalityPivot
+            return grouped.Select(g => new MortalityPivot
             {
                 CageId = g.Key.CageId,
                 Year = g.Key.Year,
                 Month = g.Key.Month,
-                TotalMortalities = g.Sum(x => x.Quantity)
-            });
-
-            return result.ToList();
+                TotalMortalities = g.Sum(m => m.Quantity)
+            }).ToList();
         }
 
     }

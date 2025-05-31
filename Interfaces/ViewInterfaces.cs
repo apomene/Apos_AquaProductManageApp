@@ -1,5 +1,6 @@
 ﻿using Apos_AquaProductManageApp.Model;
 using Apos_AquaProductManageApp.Presenters;
+using System.Security.Cryptography.Xml;
 using static Apos_AquaProductManageApp.Services.TransferService;
 
 
@@ -26,7 +27,7 @@ namespace Apos_AquaProductManageApp.Interfaces
         {
             void SetPresenter(TransferPresenter presenter);
             void DisplayTransfers(List<FishTransfer> transfers);
-            void DisplayCages(List<Cage> cages);
+            void DisplayCages(List<Cage> cages);     
             DateTime SelectedDate { get; }
         }
         public interface IBalanceView
@@ -37,9 +38,9 @@ namespace Apos_AquaProductManageApp.Interfaces
         public interface IMortalityPivotView
         {         
                 void SetPresenter(MortalityPivotPresenter presenter);
-                void DisplayPivot(List<MortalityPivot> data);
-                List<MortalityDimension> GetSelectedDimensions(); 
-            
+                List<MortalityDimension> GetSelectedDimensions();
+            void DisplayMortalityPivot(List<MortalityPivot> pivot);
+
         }
     }
 }
