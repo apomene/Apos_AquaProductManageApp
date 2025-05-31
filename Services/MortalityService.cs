@@ -52,6 +52,23 @@ namespace Apos_AquaProductManageApp.Services
             _db.SaveChanges();
         }
 
+        public void UpdateMortality(Mortality mortality)
+        {
+            _db.Mortalities.Update(mortality);
+            _db.SaveChanges();
+        }
+
+        public void DeleteMortality(Mortality mortality)
+        {
+            _db.Mortalities.Remove(mortality);
+            _db.SaveChanges();
+        }
+
+        public List<Mortality> GetAllMortalities()
+        {
+            return _db.Mortalities.Include(m => m.Cage).ToList();
+        }
+
     }
 
 

@@ -1,4 +1,5 @@
-﻿using Apos_AquaProductManageApp.Services;
+﻿using Apos_AquaProductManageApp.Model;
+using Apos_AquaProductManageApp.Services;
 using static Apos_AquaProductManageApp.Interfaces.ViewInterfaces;
 
 namespace Apos_AquaProductManageApp.Presenters
@@ -38,6 +39,18 @@ namespace Apos_AquaProductManageApp.Presenters
             _mortalityService.AddOrUpdateMortality(cageId, date, quantity);
             LoadData(date);
         }
+
+        public void UpdateMortality(Mortality mortality)
+        {
+            _mortalityService.UpdateMortality(mortality);
+        }
+
+        public void DeleteMortality(Mortality mortality)
+        {
+            _mortalityService.DeleteMortality(mortality);
+        }
+      
+
     }
 
 

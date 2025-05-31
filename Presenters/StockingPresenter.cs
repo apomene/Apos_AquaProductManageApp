@@ -1,4 +1,5 @@
-﻿using Apos_AquaProductManageApp.Services;
+﻿using Apos_AquaProductManageApp.Model;
+using Apos_AquaProductManageApp.Services;
 using static Apos_AquaProductManageApp.Interfaces.ViewInterfaces;
 
 
@@ -45,6 +46,17 @@ namespace Apos_AquaProductManageApp.Presenters
                 MessageBox.Show($"Failed to add stocking: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        public void UpdateStocking(FishStocking stocking)
+        {
+            _service.UpdateStocking(stocking);
+        }
+
+        public void DeleteStocking(FishStocking stocking)
+        {
+            _service.DeleteStocking(stocking);
+        }
+
     }
 
 }

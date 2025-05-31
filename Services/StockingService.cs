@@ -37,6 +37,19 @@ namespace Apos_AquaProductManageApp.Services
             _db.FishStockings.Add(new FishStocking { CageId = cageId, StockingDate = date, Quantity = quantity });
             _db.SaveChanges();
         }
+
+        public void UpdateStocking(FishStocking stocking)
+        {
+            _db.FishStockings.Update(stocking);
+            _db.SaveChanges();
+        }
+
+        public void DeleteStocking(FishStocking stocking)
+        {
+            _db.FishStockings.Remove(stocking);
+            _db.SaveChanges();
+        }
+
     }
 
 

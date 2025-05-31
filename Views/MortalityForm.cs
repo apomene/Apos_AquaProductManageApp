@@ -15,13 +15,15 @@ namespace Apos_AquaProductManageApp
         private DataGridView gridMortalities = null!;
         private NumericUpDown numQuantity = null!;
         private Button btnAdd = null!;
+        private Button btnDeleteMortality = null!;
+
 
         public MortalityForm() 
         { 
             InitializeComponent();
             Utilities.InitializeFormSizeFromConfig(this, "MortalityForm");
-
             Initialize();
+            SetUpDeleteButton();
         }
      
         private void Initialize()
@@ -35,7 +37,7 @@ namespace Apos_AquaProductManageApp
             {
                 Top = 40,
                 Left = 10,
-                Width = 380,
+                Width = 340,
                 Height = 220,
                 AutoGenerateColumns = true,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect
@@ -44,8 +46,8 @@ namespace Apos_AquaProductManageApp
             gridMortalities = new DataGridView
             {
                 Top = 40,
-                Left = 400,
-                Width = 380,
+                Left = 360,
+                Width = 440,
                 Height = 220,
                 AutoGenerateColumns = true,
                 ReadOnly = true
@@ -53,7 +55,7 @@ namespace Apos_AquaProductManageApp
 
             numQuantity = new NumericUpDown
             {
-                Top = 320,
+                Top = 280,
                 Left = 10,
                 Width = 100,
                 Minimum = 1,
@@ -63,7 +65,7 @@ namespace Apos_AquaProductManageApp
             btnAdd = new Button
             {
                 Text = "Add / Update",
-                Top = 320,
+                Top = 280,
                 Left = 120,
                 Width = 100
             };
@@ -95,6 +97,49 @@ namespace Apos_AquaProductManageApp
             this.Controls.Add(btnAdd);
         }
 
+        private void SetUpDeleteButton()
+        {
+           
+           
+            btnDeleteMortality = new Button
+            {
+                Text = "Delete Mortality",
+                Top = 280,
+                Left = 400,
+                Width = 120
+            };
+            btnDeleteMortality.Click += BtnDeleteMortality_Click;
+            this.Controls.Add(btnDeleteMortality);
+        }
+
+        private void BtnDeleteMortality_Click(object sender, EventArgs e)
+        {
+            if (gridMortalities.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Please select a row to delete.");
+                return;
+            }
+            var selectedMortality = gridMortalities.SelectedRows[0].DataBoundItem as Mortality;
+
+            if (selectedMortality != null)
+            {
+                var confirm = MessageBox.Show("Are you sure you want to delete this entry?", "Confirm", MessageBoxButtons.YesNo);
+                if (confirm == DialogResult.Yes)
+                {
+                    try
+                    {
+                        _presenter.DeleteMortality(selectedMortality);
+                        _presenter?.LoadData(dtPicker.Value.Date);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Deletion failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+        }
+
+
         public void SetPresenter(MortalityPresenter presenter)
         {
             _presenter = presenter;
@@ -112,12 +157,11 @@ namespace Apos_AquaProductManageApp
         public void DisplayMortalities(List<Mortality> mortalities)
         {
             gridMortalities.DataSource = null;
-            gridMortalities.DataSource = mortalities.Select(m => new
-            {
-                Cage = m.Cage?.Name ?? $"Cage {m.CageId}",
-                m.MortalityDate,
-                m.Quantity
-            }).ToList();
+            gridMortalities.DataSource = mortalities;
+            gridMortalities.Columns["Cage"].Visible = false;
+            // or show only Cage.Name:
+            gridMortalities.Columns["Cage"].DisplayIndex = 0;
+
         }
     }
 
