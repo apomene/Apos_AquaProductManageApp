@@ -50,8 +50,6 @@ namespace Apos_AquaProductManageApp.Presenters
             _mortalityService.DeleteMortality(mortality);
         }
       
-
     }
-
 
 }

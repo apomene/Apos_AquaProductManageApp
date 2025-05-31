@@ -105,7 +105,7 @@ namespace Apos_AquaProductManageApp
             {
                 Text = "Delete Mortality",
                 Top = 280,
-                Left = 400,
+                Left = 360,
                 Width = 120
             };
             btnDeleteMortality.Click += BtnDeleteMortality_Click;

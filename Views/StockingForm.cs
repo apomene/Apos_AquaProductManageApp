@@ -105,75 +105,45 @@ namespace Apos_AquaProductManageApp
             this.Controls.Add(btnDelete);
         }
 
-        private void BtnUpdateStocking_Click(object sender, EventArgs e)
+        private void HandleStockingAction(string actionType)
         {
             if (gridStocked.SelectedRows.Count == 0)
             {
-                MessageBox.Show("Please select a row to update.");
+                MessageBox.Show($"Please select a row to {actionType.ToLower()}.");
                 return;
             }
+
             var selected = gridStocked.SelectedRows[0].DataBoundItem as FishStocking;
 
             if (selected != null)
             {
-                var confirm = MessageBox.Show("Are you sure you want to update this entry?", "Confirm", MessageBoxButtons.YesNo);
+                var confirm = MessageBox.Show($"Are you sure you want to {actionType.ToLower()} this entry?", "Confirm", MessageBoxButtons.YesNo);
                 if (confirm == DialogResult.Yes)
                 {
                     try
                     {
-                        _presenter.UpdateStocking(selected);
+                        if (actionType == "Update")
+                            _presenter.UpdateStocking(selected);
+                        else if (actionType == "Delete")
+                            _presenter.DeleteStocking(selected);
+
                         _presenter.LoadStockingData(dtPicker.Value.Date);
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"Update failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show($"{actionType} failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
+        }
+        private void BtnUpdateStocking_Click(object sender, EventArgs e)
+        {
+            HandleStockingAction("Update");
         }
 
         private void BtnDeleteStocking_Click(object sender, EventArgs e)
         {
-            if (gridStocked.SelectedRows.Count == 0)
-            {
-                MessageBox.Show("Please select a row to delete.");
-                return;
-            }
-            var selected= gridStocked.SelectedRows[0].DataBoundItem as FishStocking;
-
-            if (selected != null)
-            {
-                var confirm = MessageBox.Show("Are you sure you want to delete this entry?", "Confirm", MessageBoxButtons.YesNo);
-                if (confirm == DialogResult.Yes)
-                {
-                    try
-                    {
-                        _presenter.DeleteStocking(selected);
-                        _presenter.LoadStockingData(dtPicker.Value.Date);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Deletion failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-            }
-        }
-
-
-        private void DataGridView_UserDeletingRow(object sender, DataGridViewRowCancelEventArgs e)
-        {
-            if (e.Row.DataBoundItem is FishStocking stockingToDelete)
-            {
-                try
-                {
-                    _presenter.DeleteStocking(stockingToDelete);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Deletion failed: {ex.Message}");
-                    e.Cancel = true;
-                }
-            }
+            HandleStockingAction("Delete");
         }
 
 
