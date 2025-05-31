@@ -27,11 +27,11 @@ namespace Apos_AquaProductManageApp
             dtPicker = new DateTimePicker { Top = 10, Left = 10, Width = 200 };
             dtPicker.ValueChanged += (s, e) => _presenter.LoadStockingData(dtPicker.Value.Date);
 
-            gridAvailable = new DataGridView { Top = 40, Left = 10, Width = 800, Height = 250, AutoGenerateColumns = true };
+            gridAvailable = new DataGridView { Top = 40, Left = 10, Width = 800, Height = 210, AutoGenerateColumns = true };
             gridAvailable.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             gridAvailable.ScrollBars = ScrollBars.Vertical;
 
-            gridStocked = new DataGridView { Top = 310, Left = 10, Width = 800, Height = 250, AutoGenerateColumns = true };
+            gridStocked = new DataGridView { Top = 260, Left = 10, Width = 800, Height = 210, AutoGenerateColumns = true };
             gridStocked.ScrollBars = ScrollBars.Vertical;
             Label lblQuantity = new Label { Text = "Set Quantity", Top = 480, Left = 10 };
             numQuantity = new NumericUpDown { Top = 480, Left = 130, Width = 100, Minimum = 1, Maximum = 100000 };
