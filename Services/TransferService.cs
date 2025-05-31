@@ -7,10 +7,12 @@ namespace Apos_AquaProductManageApp.Services
     public class TransferService
     {
         private readonly FishFarmDbContext _context;
+        private readonly StockBalanceService _balanceService;
 
-        public TransferService(FishFarmDbContext context)
+        public TransferService(FishFarmDbContext context, StockBalanceService balanceService)
         {
             _context = context;
+            _balanceService = balanceService;
         }
 
         public List<FishTransfer> GetTransfersByDate(DateTime date)
@@ -18,12 +20,27 @@ namespace Apos_AquaProductManageApp.Services
             return _context.FishTransfers
                 .Where(t => t.TransferDate.Date == date.Date)
                 .Include(t => t.FromCage)
-                .Include(t => t.ToCage)
-            .ToList();
+            .Include(t => t.ToCage)
+                .ToList();
         }
 
         public void AddTransfer(FishTransfer transfer)
         {
+            int fromStock = _balanceService.GetStockBalance(transfer.FromCageId, transfer.TransferDate);
+            if (transfer.FromCageId == transfer.ToCageId)
+                throw new InvalidOperationException("Cannot transfer fish to the same cage.");
+            if (transfer.Quantity <= 0)
+                throw new InvalidOperationException("Transfer quantity must be greater than zero.");
+
+            if (transfer.Quantity > fromStock)
+                throw new InvalidOperationException("Transfer quantity exceeds available stock.");
+
+            var fromCage = _context.Cages.FirstOrDefault(c => c.CageId == transfer.FromCageId)
+                ?? throw new InvalidOperationException($"From cage with ID {transfer.FromCageId} not found.");
+
+            var toCage = _context.Cages.FirstOrDefault(c => c.CageId == transfer.ToCageId)
+                ?? throw new InvalidOperationException($"To cage with ID {transfer.ToCageId} not found.");
+
             var balance = CalculateBalance(transfer.FromCageId, transfer.TransferDate);
 
             if (balance < transfer.Quantity)
