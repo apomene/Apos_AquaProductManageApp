@@ -25,9 +25,8 @@ namespace Apos_AquaProductManageApp
         private void Initialize()
         {
             _cageGrid = new DataGridView { Dock = DockStyle.Top, Height = 200, AutoGenerateColumns = true };
+            _cageGrid.ReadOnly = true;
             _cageGrid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            _cageGrid.MultiSelect = false;
-
             txtName = new TextBox { PlaceholderText = "Name", Top = 210, Left = 10, Width = 200 };
             chkIsActive = new CheckBox { Text = "Is Active", Top = 210, Left = 220 };
 
