@@ -1,7 +1,6 @@
 ﻿using Apos_AquaProductManageApp.Model;
 using Apos_AquaProductManageApp.Presenters;
 using Apos_AquaProductManageApp.Services;
-using Apos_AquaProductManageApp.Views;
 using static Apos_AquaProductManageApp.Interfaces.ViewInterfaces;
 
 namespace Apos_AquaProductManageApp
@@ -125,77 +124,92 @@ namespace Apos_AquaProductManageApp
             }
         }
 
-        private void ExecuteTransfers()
+        private void BtnSaveTransfer_Click(object sender, EventArgs e)
         {
-            var sourceCage = cbSourceCage.SelectedItem as Cage;
-            if (sourceCage == null)
+            try
             {
-                MessageBox.Show("Please select a source cage.");
+                if (cbSourceCage.SelectedItem is not Cage sourceCage)
+                {
+                    ShowMessage("Please select a source cage.");
+                    return;
+                }
+
+                ExecuteTransfers(sourceCage);
+            }
+            catch (Exception ex)
+            {
+                ShowMessage($"Error saving transfers: {ex.Message}", "Error", MessageBoxIcon.Error);
+            }
+        }
+
+        private void ExecuteTransfers(Cage sourceCage)
+        {
+            var transfersToMake = CollectValidTransfers(out int totalQuantity);
+
+            if (totalQuantity == 0)
+            {
+                ShowMessage("No transfers to make. Please enter quantities in the destination cages.", "No Transfers", MessageBoxIcon.Information);
                 return;
             }
 
-            int totalQuantity = 0;
-            var transfersToMake = new List<(int toCageId, int quantity)>();
+            int availableBalance = _transferService.CalculateBalance(sourceCage.CageId, dtPicker.Value.Date);
+            if (totalQuantity > availableBalance)
+            {
+                ShowMessage($"Total transfer quantity ({totalQuantity}) exceeds available stock ({availableBalance}). No transfers were made.", "Invalid Transfer", MessageBoxIcon.Warning);
+                return;
+            }
+
+            TryPerformTransfers(sourceCage, transfersToMake);
+        }
+
+        private List<(int toCageId, int quantity)> CollectValidTransfers(out int totalQuantity)
+        {
+            totalQuantity = 0;
+            var transfers = new List<(int toCageId, int quantity)>();
 
             foreach (DataGridViewRow row in gridDestinations.Rows)
             {
                 if (row.Cells["Quantity"].Value is int quantity && quantity > 0)
                 {
-                    var destCage = _cages.FirstOrDefault(c => c.Name == row.Cells["CageName"].Value.ToString());
+                    string? cageName = row.Cells["CageName"].Value?.ToString();
+                    var destCage = _cages.FirstOrDefault(c => c.Name == cageName);
                     if (destCage != null)
                     {
+                        transfers.Add((destCage.CageId, quantity));
                         totalQuantity += quantity;
-                        transfersToMake.Add((destCage.CageId, quantity));
                     }
                 }
             }
 
-            int availableBalance = _transferService.CalculateBalance(sourceCage.CageId, dtPicker.Value.Date);
-
-            if (totalQuantity > availableBalance)
-            {
-                MessageBox.Show($"Total transfer quantity ({totalQuantity}) exceeds available stock ({availableBalance}). No transfers were made.", "Invalid Transfer", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            // Proceed to do transfers
-            try
-            {
-                foreach (var (toCageId, quantity) in transfersToMake)
-                {
-                    _presenter.TransferFish(sourceCage.CageId, toCageId, dtPicker.Value.Date, quantity);
-                }
-                MessageBox.Show("Transfers completed successfully.");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Transfer failed: {ex.Message}");
-            }
-            finally
-            {
-                _presenter.LoadTransfers(dtPicker.Value.Date);               
-            }
+            return transfers;
         }
 
-
-        private void BtnSaveTransfer_Click(object sender, EventArgs e)
+        private void TryPerformTransfers(Cage sourceCage, List<(int toCageId, int quantity)> transfers)
         {
             try
             {
-                if (cbSourceCage.SelectedItem is Cage sourceCage)
+                foreach (var (toCageId, quantity) in transfers)
                 {
-                    ExecuteTransfers();
+                    _presenter.TransferFish(sourceCage.CageId, toCageId, dtPicker.Value.Date, quantity);
                 }
-                else
-                {
-                    MessageBox.Show("Please select a source cage.");
-                }
+
+                ShowMessage("Transfers completed successfully.");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error saving transfers: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowMessage($"Transfer failed: {ex.Message}");
+            }
+            finally
+            {
+                _presenter.LoadTransfers(dtPicker.Value.Date);
             }
         }
+
+        private void ShowMessage(string message, string title = "Notice", MessageBoxIcon icon = MessageBoxIcon.None)
+        {
+            MessageBox.Show(message, title, MessageBoxButtons.OK, icon);
+        }
+
 
         public void DisplayTransfers(List<FishTransfer> transfers)
         {
@@ -256,14 +270,11 @@ namespace Apos_AquaProductManageApp
 
         }
 
-
         public class DestinationCageEntry
         {
             public string? CageName { get; set; }
             public int Quantity { get; set; }
         }
-
-
 
         public void SetPresenter(TransferPresenter presenter)
         {
