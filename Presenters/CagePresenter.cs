@@ -107,7 +107,6 @@ namespace Apos_AquaProductManageApp.Presenters
             {
                 LoadCages();
             }
-
         }
     }
 }

@@ -30,10 +30,6 @@ namespace Apos_AquaProductManageApp.Presenters
         public void DeleteMortality(Mortality mortality)
         {
             _service.DeleteMortality(mortality);
-        }
-      
-
+        }     
     }
-
-
 }

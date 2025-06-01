@@ -50,8 +50,7 @@ namespace Apos_AquaProductManageApp.Services
         public List<Cage> GetCages(DateTime date)
         {
             return _db.Cages
-                .ToList();
-               
+                .ToList();              
         }
     }
 

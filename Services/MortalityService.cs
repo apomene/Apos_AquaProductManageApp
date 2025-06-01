@@ -61,8 +61,6 @@ namespace Apos_AquaProductManageApp.Services
 
             _db.SaveChanges();
         }
-
-
         public void UpdateMortality(Mortality mortality)
         {
             var existing = _db.Mortalities.First(m => m.MortalityId == mortality.MortalityId);
@@ -108,9 +106,5 @@ namespace Apos_AquaProductManageApp.Services
 
             return merged.ToList();
         }
-
-
     }
-
-
 }

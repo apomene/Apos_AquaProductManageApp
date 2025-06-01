@@ -80,7 +80,7 @@ namespace Apos_AquaProductManageApp
                     }
                     finally
                     {
-                        _presenter.LoadMortalityData(dtPicker.Value.Date); // Refresh
+                        _presenter.LoadMortalityData(dtPicker.Value.Date);
                     }
                 }
             }

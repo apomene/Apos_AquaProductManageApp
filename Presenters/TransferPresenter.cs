@@ -16,8 +16,6 @@ namespace Apos_AquaProductManageApp.Presenters
             _service = service;
             _view.SetPresenter(this);
         }
-
-
         public void LoadTransfers(DateTime date)
         {
             var transfers = _service.GetTransfersByDate(date);
@@ -35,11 +33,5 @@ namespace Apos_AquaProductManageApp.Presenters
         {
             _service.TransferFish(fromCageId, toCageId, date, quantity);
         }
-
-
-
-
     }
-
-
 }

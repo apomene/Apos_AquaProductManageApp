@@ -229,8 +229,6 @@ namespace Apos_AquaProductManageApp
                 if (toCageColumn != null)
                     toCageColumn.Visible = false;
             }
-
-
         }
 
         public void DisplayCages(List<Cage> cages)
@@ -267,7 +265,6 @@ namespace Apos_AquaProductManageApp
             {
                 cageNameColumn.ReadOnly = true;
             }
-
         }
 
         public class DestinationCageEntry

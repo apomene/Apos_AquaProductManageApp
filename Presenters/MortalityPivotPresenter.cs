@@ -22,7 +22,6 @@ namespace Apos_AquaProductManageApp.Presenters
             var pivotData = _service.GetMortalityPivot(dimensions);
             _view.DisplayMortalityPivot(pivotData);
         }
-
     }
 
 }

@@ -40,10 +40,5 @@ namespace Apos_AquaProductManageApp.Presenters
         {
             return _service.GetMergedCageStockings(date);
         }
-
-
-
-
     }
-
 }

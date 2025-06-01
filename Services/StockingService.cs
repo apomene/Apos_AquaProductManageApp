@@ -100,5 +100,4 @@ namespace Apos_AquaProductManageApp.Services
             }).ToList();
         }
     }
-
 }
