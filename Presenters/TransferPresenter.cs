@@ -9,13 +9,11 @@ namespace Apos_AquaProductManageApp.Presenters
     {
         private readonly ITransferView _view;
         private readonly TransferService _service;
-        private readonly CageService _cageService;
 
-        public TransferPresenter(ITransferView view, TransferService service, CageService cageService)
+        public TransferPresenter(ITransferView view, TransferService service)
         {
             _view = view;
             _service = service;
-            _cageService = cageService;
             _view.SetPresenter(this);
         }
 
@@ -28,7 +26,7 @@ namespace Apos_AquaProductManageApp.Presenters
 
         public List<Cage> LoadCages()
         {
-            var cages = _service.GetAllCages();
+            var cages = _service.GetAllCages().Where(c => c.IsActive).ToList();
             _view.DisplayCages(cages);
             return cages;
         }

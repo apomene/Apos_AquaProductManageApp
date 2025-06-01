@@ -1,5 +1,6 @@
 ﻿using Apos_AquaProductManageApp.DBContext;
 using Apos_AquaProductManageApp.Model;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace Apos_AquaProductManageApp.Services
@@ -13,6 +14,7 @@ namespace Apos_AquaProductManageApp.Services
         {
             return _db.Cages.Any() ? _db.Cages.ToList() : new List<Cage>();
         }
+
 
         public void AddCage(string name, bool isActive)
         {

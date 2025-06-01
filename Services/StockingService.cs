@@ -86,7 +86,7 @@ namespace Apos_AquaProductManageApp.Services
 
         public List<SetQuantityView> GetMergedCageStockings(DateTime date)
         {
-            var allCages = _db.Cages.ToList();
+            var allCages = _db.Cages.Where(c => c.IsActive).ToList();
             var existingStockings = _db.FishStockings.Where(s => s.StockingDate == date).ToList();
 
             return allCages.Select(c => {

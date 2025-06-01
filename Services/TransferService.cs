@@ -26,7 +26,7 @@ namespace Apos_AquaProductManageApp.Services
 
         public List<Cage> GetAllCages()
         {
-            return _context.Cages.OrderBy(c => c.Name).ToList();
+            return _context.Cages .Where(c => c.IsActive).OrderBy(c => c.Name).ToList();
         }
 
         public void TransferFish(int fromCageId, int toCageId, DateTime date, int quantity)

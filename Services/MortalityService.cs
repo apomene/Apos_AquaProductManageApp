@@ -91,7 +91,7 @@ namespace Apos_AquaProductManageApp.Services
 
         public List<SetQuantityView> GetMergedCageMortalities(DateTime date)
         {
-            var allCages = _db.Cages.ToList();
+            var allCages = _db.Cages.Where(c => c.IsActive).ToList();
             var mortalities = _db.Mortalities
                 .Where(m => m.MortalityDate == date)
                 .ToList();
