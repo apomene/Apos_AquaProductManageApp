@@ -2,21 +2,21 @@
 using Apos_AquaProductManageApp.Presenters;
 using Apos_AquaProductManageApp.Services;
 using Apos_AquaProductManageApp.Views;
+using System.ComponentModel;
 using static Apos_AquaProductManageApp.Interfaces.ViewInterfaces;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Apos_AquaProductManageApp
 {
     public partial class StockingForm : Form, IStockingView
     {
-        private StockingPresenter _presenter =null!;
-        private DataGridView gridAvailable = null!, gridStocked = null!;
-        private DateTimePicker dtPicker =null!;
-        private NumericUpDown numQuantity = null!;
-        private Button btnAdd = null!;
-        private Button btnUPdate = null!;
-        private Button btnDelete = null!;
+        private StockingPresenter _presenter = null!;
+        private DateTimePicker _dtPicker = null!;
+        private DataGridView _grid = null!;
         private readonly TransferService _transferService;
 
+        private List<Cage> _allCages = new();
+        private List<FishStocking> _stockings = new();
 
         public StockingForm(TransferService transferService)
         {
@@ -25,202 +25,167 @@ namespace Apos_AquaProductManageApp
             Utilities.InitializeFormSizeFromConfig(this, "StockingForm");
             Initialize();
         }
-     
+
         private void Initialize()
         {
-
-            dtPicker = new DateTimePicker { Top = 10, Left = 10, Width = 200 };
-            dtPicker.ValueChanged += (s, e) => _presenter.LoadStockingData(dtPicker.Value.Date);
-
-            gridAvailable = new DataGridView { Top = 40, Left = 10, Width = 800, Height = 210, AutoGenerateColumns = true };
-            gridAvailable.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            gridAvailable.ScrollBars = ScrollBars.Vertical;
-
-             Label lblQuantity = new Label { Text = "Set Quantity", Top = 480, Left = 10 };
-            numQuantity = new NumericUpDown { Top = 480, Left = 130, Width = 100, Minimum = 1, Maximum = 100000 };
-          
-            gridAvailable.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-           
-           
-            numQuantity.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-
-            SetUpStockGrid();
-            SetUpButtons();          
-
-            this.Controls.Add(dtPicker);
-            this.Controls.Add(gridAvailable);
-            this.Controls.Add(gridStocked);
-            this.Controls.Add(lblQuantity);
-            this.Controls.Add(numQuantity);          
-            this.Text = "Fish Stocking";
-
-        }
-
-        private void SetUpStockGrid()
-        {
-            gridStocked = new DataGridView { Top = 260, Left = 10, Width = 800, Height = 210, AutoGenerateColumns = true };
-            gridStocked.ScrollBars = ScrollBars.Vertical;
-
-            gridStocked.ReadOnly = false;
-            gridStocked.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            gridStocked.AllowUserToAddRows = false;
-            gridStocked.AllowUserToDeleteRows = true;
-            gridStocked.EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
-            gridStocked.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            gridStocked.CellValidating += gridStocking_CellValidating;
-        }
-
-        private void SetUpButtons()
-        {
-            btnAdd = new Button { Text = "Add Stocking", Top = 480, Left = 240 };
-            btnAdd.Click += (s, e) =>
+            _dtPicker = new DateTimePicker { Top = 10, Left = 10, Width = 200 };
+            _dtPicker.ValueChanged += (s, e) =>
             {
-
-                if (gridAvailable.SelectedRows.Count > 0 && gridAvailable.SelectedRows[0].DataBoundItem is Cage cage)
-                {
-                    _presenter.AddStocking(cage.CageId, dtPicker.Value.Date, (int)numQuantity.Value);
-                }
-                else
-                {
-                    MessageBox.Show("Please select a valid cage.");
-                }
+                var data = _presenter.GetMergedCageStockings(_dtPicker.Value.Date);
+                DisplayStockings(data);
             };
-            btnAdd.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-            this.Controls.Add(btnAdd);
-            btnUPdate = new Button
+
+            Controls.Add(_dtPicker);
+
+            _grid = new DataGridView
             {
-                Text = "Update",
-                Top = 480,
-                Left = 340,
+                Top = 50,
+                Left = 10,
+                Width = 850,
+                Height = 550,
+                AutoGenerateColumns = false,
+                AllowUserToAddRows = false,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right,
+                EditMode = DataGridViewEditMode.EditOnEnter
+            };
+            _grid.CellValidating += Grid_CellValidating;
+            _grid.CellEndEdit += gridStocked_CellEndEdit;
+
+            Controls.Add(_grid);
+
+            SetupGridColumns();
+        }
+
+        private void SetupGridColumns()
+        {
+            _grid.Columns.Clear();
+            _grid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Cage ID", DataPropertyName = "CageId", ReadOnly = true });
+            _grid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Cage Name", DataPropertyName = "CageName", ReadOnly = true });
+            _grid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Quantity", DataPropertyName = "Quantity" });
+        }
+
+   
+        public void SetPresenter(StockingPresenter presenter)
+        {
+            _presenter = presenter;
+            var mergedData = _presenter.GetMergedCageStockings(DateTime.Today);
+            DisplayStockings(mergedData);
+        }
+
+        public void DisplayAvailableCages(List<Cage> cages)
+        {
+            _allCages = cages;
+            MergeCagesWithStocking();
+        }
+
+        public void DisplayStockings(List<CageStockingView> data)
+        {
+            _grid.Columns.Clear();
+            _grid.AutoGenerateColumns = false;
+            _grid.ReadOnly = false;
+            _grid.EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
+            _grid.AllowUserToAddRows = false;
+            _grid.AllowUserToDeleteRows = false;
+
+            
+            _grid.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "CageName",
+                HeaderText = "Cage",
+                ReadOnly = true,
+                Width = 150
+            });
+
+            
+            _grid.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Quantity",
+                HeaderText = "Quantity",
+                ReadOnly = false,
                 Width = 100
-            };
-            btnDelete = new Button
+            });
+
+            _grid.Columns.Add(new DataGridViewTextBoxColumn
             {
-                Text = "Delete",
-                Top = 480,
-                Left = 460,
-                Width = 100
-            };
-            btnUPdate.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-            btnDelete.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-            btnUPdate.Click += BtnUpdateStocking_Click;
-            btnDelete.Click += BtnDeleteStocking_Click;
-            this.Controls.Add(btnUPdate);
-            this.Controls.Add(btnDelete);
+                DataPropertyName = "CageId",
+                Name = "CageId",
+                Visible = false 
+            });
+
+
+            _grid.DataSource = new BindingList<CageStockingView>(data);
         }
 
-        private void gridStocking_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
-        {
-            var grid = (DataGridView)sender;
 
-            // Get the column being edited (e.g., "Quantity")
-            if (grid.Columns[e.ColumnIndex].Name == "Quantity")
+        private void MergeCagesWithStocking()
+        {
+            if (_allCages == null || _stockings == null) return;
+
+            var combined = _allCages
+                .Select(cage =>
+                {
+                    var stocking = _stockings.FirstOrDefault(s => s.CageId == cage.CageId);
+                    return new
+                    {
+                        CageId = cage.CageId,
+                        CageName = cage.Name,
+                        Quantity = stocking?.Quantity ?? 0
+                    };
+                })
+                .ToList();
+
+            _grid.DataSource = combined;
+        }
+
+        private void Grid_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
+        {
+            if (_grid.Columns[e.ColumnIndex].Name == "Quantity")
             {
                 if (int.TryParse(e.FormattedValue.ToString(), out int newQuantity))
                 {
-                    var stocking = (FishStocking)grid.Rows[e.RowIndex].DataBoundItem;
+                    var row = _grid.Rows[e.RowIndex];
+                    var data = (CageStockingView)row.DataBoundItem;
 
-                    // Simulate balance if this change were applied
-                    int simulatedBalance = _transferService.CalculateBalance(stocking.CageId, stocking.StockingDate) - stocking.Quantity + newQuantity;
+                    int currentQty = data.Quantity;
+                    int simulatedBalance = _transferService.CalculateBalance(data.CageId, _dtPicker.Value.Date)
+                                              - currentQty + newQuantity;
 
                     if (simulatedBalance < 0)
                     {
                         MessageBox.Show("This update would result in a negative stock balance.", "Invalid Operation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        e.Cancel = true; // Cancel the edit
+                        e.Cancel = true;
                     }
                 }
             }
         }
 
-
-        private void BtnUpdateStocking_Click(object sender, EventArgs e)
+        private void gridStocked_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
-            if (gridStocked.SelectedRows.Count == 0)
+            if (e.RowIndex >= 0)
             {
-                MessageBox.Show("Please select a row to update.");
-                return;
-            }
-            var selected = gridStocked.SelectedRows[0].DataBoundItem as FishStocking;
+                var updated = _grid.Rows[e.RowIndex].DataBoundItem as CageStockingView;
 
-            if (selected != null)
-            {
-                var confirm = MessageBox.Show("Are you sure you want to update this entry?", "Confirm", MessageBoxButtons.YesNo);
-                if (confirm == DialogResult.Yes)
+                if (updated != null)
                 {
                     try
                     {
-                        _presenter.UpdateStocking(selected);
-                        
+                        _presenter.AddOrUpdateStocking(updated.CageId, _dtPicker.Value.Date, updated.Quantity);
+                        _presenter.LoadStockingData(_dtPicker.Value.Date); 
                     }
                     catch (Exception ex)
                     {
                         MessageBox.Show($"Update failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
-                    finally
-                    {
-                        _presenter.LoadStockingData(dtPicker.Value.Date);
-                    }
                 }
             }
         }
-
-        private void BtnDeleteStocking_Click(object sender, EventArgs e)
-        {
-            if (gridStocked.SelectedRows.Count == 0)
-            {
-                MessageBox.Show("Please select a row to delete.");
-                return;
-            }
-            var selected= gridStocked.SelectedRows[0].DataBoundItem as FishStocking;
-
-            if (selected != null)
-            {
-                var confirm = MessageBox.Show("Are you sure you want to delete this entry?", "Confirm", MessageBoxButtons.YesNo);
-                if (confirm == DialogResult.Yes)
-                {
-                    try
-                    {
-                        _presenter.DeleteStocking(selected);
-                        _presenter.LoadStockingData(dtPicker.Value.Date);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Deletion failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-            }
-        }
-
-
-        private void DataGridView_UserDeletingRow(object sender, DataGridViewRowCancelEventArgs e)
-        {
-            if (e.Row.DataBoundItem is FishStocking stockingToDelete)
-            {
-                try
-                {
-                    _presenter.DeleteStocking(stockingToDelete);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Deletion failed: {ex.Message}");
-                    e.Cancel = true;
-                }
-            }
-        }
-
-
-
-        public void SetPresenter(StockingPresenter presenter) { _presenter = presenter; _presenter.LoadStockingData(DateTime.Today); }
-        public void DisplayAvailableCages(List<Cage> cages) { gridAvailable.DataSource = null; gridAvailable.DataSource = cages; }
-        public void DisplayStockings(List<FishStocking> stockings)
-        {
-            Utilities.BindDataSource(gridStocked, stockings, "Cage");
-        }
-
+    
         public void RefreshCageGrid()
         {
-            _presenter.LoadStockingData(dtPicker.Value.Date);           
+            _presenter.LoadStockingData(_dtPicker.Value.Date);
         }
 
+
     }
+
 }

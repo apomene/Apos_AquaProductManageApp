@@ -54,6 +54,13 @@ namespace Apos_AquaProductManageApp.Services
                 .Where(c => GetStockBalance(c.CageId, date) == 0)
                 .ToList();
         }
+
+        public List<Cage> GetCages(DateTime date)
+        {
+            return _db.Cages
+                .ToList();
+               
+        }
     }
 
 }
