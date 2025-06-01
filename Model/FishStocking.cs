@@ -20,13 +20,6 @@ namespace Apos_AquaProductManageApp.Model
         [NotMapped]
         public string CageName => Cage?.Name ?? "Unknown";
 
-    }
-
-    public class CageStockingView
-    {
-        public int CageId { get; set; }
-        public string CageName { get; set; }
-        public int Quantity { get; set; }
-    }
+    }   
 
 }

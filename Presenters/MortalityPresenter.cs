@@ -7,41 +7,29 @@ namespace Apos_AquaProductManageApp.Presenters
     public class MortalityPresenter
     {
         private readonly IMortalityView _view;
-        private readonly MortalityService _mortalityService;
-        private readonly StockBalanceService _balanceService;
+        private readonly MortalityService _service;
 
-        public MortalityPresenter(IMortalityView view, MortalityService mortalityService, StockBalanceService balanceService)
+        public MortalityPresenter(IMortalityView view, MortalityService service)
         {
             _view = view;
-            _mortalityService = mortalityService;
-            _balanceService = balanceService;
+            _service = service;
             _view.SetPresenter(this);
         }
 
-        public void LoadData(DateTime date)
+        public void LoadMortalityData(DateTime date)
         {
-            var cages = _mortalityService.GetCagesEligibleForMortality(date);
-            var mortalities = _mortalityService.GetMortalitiesByDate(date);
-
-            _view.DisplayEligibleCages(cages);
-            _view.DisplayMortalities(mortalities);
+            var merged = _service.GetMergedCageMortalities(date);
+            _view.DisplayMortalityData(merged);
         }
 
         public void AddOrUpdateMortality(int cageId, DateTime date, int quantity)
         {
-           
-            _mortalityService.AddOrUpdateMortality(cageId, date, quantity);
-            LoadData(date);
-        }
-
-        public void UpdateMortality(Mortality mortality)
-        {
-            _mortalityService.UpdateMortality(mortality);
+            _service.AddOrUpdateMortality(cageId, date, quantity);
         }
 
         public void DeleteMortality(Mortality mortality)
         {
-            _mortalityService.DeleteMortality(mortality);
+            _service.DeleteMortality(mortality);
         }
       
 

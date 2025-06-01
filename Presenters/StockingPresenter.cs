@@ -36,7 +36,7 @@ namespace Apos_AquaProductManageApp.Presenters
             _service.DeleteStocking(cageId, date);
         }
 
-        public List<CageStockingView> GetMergedCageStockings(DateTime date)
+        public List<SetQuantityView> GetMergedCageStockings(DateTime date)
         {
             return _service.GetMergedCageStockings(date);
         }

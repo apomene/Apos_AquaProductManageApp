@@ -72,7 +72,7 @@ namespace Apos_AquaProductManageApp
             {
                 var mortalityService = serviceProvider.GetRequiredService<MortalityService>();
                 var balanceService = serviceProvider.GetRequiredService<StockBalanceService>();
-                return new MortalityPresenter((IMortalityView)view, mortalityService, balanceService);
+                return new MortalityPresenter((IMortalityView)view, mortalityService);
             }),
             () => AddCustomTab(() => new TransferForm(), "Fish Transfers", view =>
             {

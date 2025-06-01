@@ -89,6 +89,27 @@ namespace Apos_AquaProductManageApp.Services
             return _db.Mortalities.Include(m => m.Cage).ToList();
         }
 
+        public List<SetQuantityView> GetMergedCageMortalities(DateTime date)
+        {
+            var allCages = _db.Cages.ToList();
+            var mortalities = _db.Mortalities
+                .Where(m => m.MortalityDate == date)
+                .ToList();
+
+            var merged = from cage in allCages
+                         join mort in mortalities on cage.CageId equals mort.CageId into mj
+                         from submort in mj.DefaultIfEmpty()
+                         select new SetQuantityView
+                         {
+                             CageId = cage.CageId,
+                             CageName = cage.Name,
+                             Quantity = submort?.Quantity ?? 0
+                         };
+
+            return merged.ToList();
+        }
+
+
     }
 
 

@@ -78,7 +78,7 @@ namespace Apos_AquaProductManageApp
             MergeCagesWithStocking();
         }
 
-        public void DisplayStockings(List<CageStockingView> data)
+        public void DisplayStockings(List<SetQuantityView> data)
         {
             _grid.Columns.Clear();
             _grid.AutoGenerateColumns = false;
@@ -113,7 +113,7 @@ namespace Apos_AquaProductManageApp
             });
 
 
-            _grid.DataSource = new BindingList<CageStockingView>(data);
+            _grid.DataSource = new BindingList<SetQuantityView>(data);
         }
 
 
@@ -144,7 +144,7 @@ namespace Apos_AquaProductManageApp
                 if (int.TryParse(e.FormattedValue.ToString(), out int newQuantity))
                 {
                     var row = _grid.Rows[e.RowIndex];
-                    var data = (CageStockingView)row.DataBoundItem;
+                    var data = (SetQuantityView)row.DataBoundItem;
 
                     int currentQty = data.Quantity;
                     int simulatedBalance = _transferService.CalculateBalance(data.CageId, _dtPicker.Value.Date)
@@ -163,20 +163,24 @@ namespace Apos_AquaProductManageApp
         {
             if (e.RowIndex >= 0)
             {
-                var updated = _grid.Rows[e.RowIndex].DataBoundItem as CageStockingView;
+                var updated = _grid.Rows[e.RowIndex].DataBoundItem as SetQuantityView;
 
                 if (updated != null)
                 {
                     try
                     {
                         _presenter.AddOrUpdateStocking(updated.CageId, _dtPicker.Value.Date, updated.Quantity);
-                        _presenter.LoadStockingData(_dtPicker.Value.Date); 
                     }
+
                     catch (Exception ex)
                     {
                         MessageBox.Show($"Update failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
-                }
+                    finally
+                    {
+                        _presenter.LoadStockingData(_dtPicker.Value.Date);
+                    }
+                }                
             }
         }
     

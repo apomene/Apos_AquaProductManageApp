@@ -84,14 +84,14 @@ namespace Apos_AquaProductManageApp.Services
             _db.SaveChanges();
         }
 
-        public List<CageStockingView> GetMergedCageStockings(DateTime date)
+        public List<SetQuantityView> GetMergedCageStockings(DateTime date)
         {
             var allCages = _db.Cages.ToList();
             var existingStockings = _db.FishStockings.Where(s => s.StockingDate == date).ToList();
 
             return allCages.Select(c => {
                 var stocking = existingStockings.FirstOrDefault(s => s.CageId == c.CageId);
-                return new CageStockingView
+                return new SetQuantityView
                 {
                     CageId = c.CageId,
                     CageName = c.Name,
