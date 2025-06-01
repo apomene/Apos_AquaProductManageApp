@@ -2,7 +2,6 @@
 using Apos_AquaProductManageApp.Model;
 using Apos_AquaProductManageApp.Services;
 using static Apos_AquaProductManageApp.Interfaces.ViewInterfaces;
-using static Apos_AquaProductManageApp.Services.TransferService;
 
 namespace Apos_AquaProductManageApp.Presenters
 {
