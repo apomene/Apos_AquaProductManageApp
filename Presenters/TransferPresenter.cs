@@ -9,28 +9,29 @@ namespace Apos_AquaProductManageApp.Presenters
     {
         private readonly ITransferView _view;
         private readonly TransferService _service;
-        private readonly CageService _cageService;
 
-        public TransferPresenter(ITransferView view, TransferService service, CageService cageService)
+        public TransferPresenter(ITransferView view, TransferService service)
         {
             _view = view;
             _service = service;
-            _cageService = cageService;
             _view.SetPresenter(this);
         }
-
-        public void LoadData(DateTime date)
+        public void LoadTransfers(DateTime date)
         {
-            _view.DisplayTransfers(_service.GetTransfersByDate(date));
-            _view.DisplayCages(_cageService.GetAllCages());
+            var transfers = _service.GetTransfersByDate(date);
+            _view.DisplayTransfers(transfers);
         }
 
-        public void AddTransfer(FishTransfer transfer)
+        public List<Cage> LoadCages()
         {
-            _service.AddTransfer(transfer);
-            LoadData(transfer.TransferDate);
+            var cages = _service.GetAllCages().Where(c => c.IsActive).ToList();
+            _view.DisplayCages(cages);
+            return cages;
+        }
+
+        public void TransferFish(int fromCageId, int toCageId, DateTime date, int quantity)
+        {
+            _service.TransferFish(fromCageId, toCageId, date, quantity);
         }
     }
-
-
 }

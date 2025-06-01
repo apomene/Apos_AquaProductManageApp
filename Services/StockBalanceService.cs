@@ -23,15 +23,7 @@ namespace Apos_AquaProductManageApp.Services
                 .Where(m => m.CageId == cageId && m.MortalityDate <= date)
                 .Sum(m => (int?)m.Quantity) ?? 0;
 
-            var transfersIn = _db.FishTransfers
-                .Where(t => t.ToCageId == cageId && t.TransferDate <= date)
-                .Sum(t => (int?)t.Quantity) ?? 0;
-
-            var transfersOut = _db.FishTransfers
-                .Where(t => t.FromCageId == cageId && t.TransferDate <= date)
-                .Sum(t => (int?)t.Quantity) ?? 0;
-
-            return stocked + transfersIn - mortalities - transfersOut;
+            return stocked - mortalities;
         }
 
         public bool CageHasFishOnDate(int cageId, DateTime date)
@@ -53,6 +45,12 @@ namespace Apos_AquaProductManageApp.Services
                 .ToList()
                 .Where(c => GetStockBalance(c.CageId, date) == 0)
                 .ToList();
+        }
+
+        public List<Cage> GetCages(DateTime date)
+        {
+            return _db.Cages
+                .ToList();              
         }
     }
 

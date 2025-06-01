@@ -1,7 +1,6 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 using Apos_AquaProductManageApp.Model;
-using static Apos_AquaProductManageApp.Model.FishFarmModel;
 
 namespace Apos_AquaProductManageApp.DBContext
 {    

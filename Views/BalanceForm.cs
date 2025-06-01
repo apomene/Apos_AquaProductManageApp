@@ -55,6 +55,7 @@ namespace Apos_AquaProductManageApp.Views
         public void RefreshBalance()
         {
             _presenter.LoadBalances(datePicker.Value.Date);
+           
         }
 
     }

@@ -13,32 +13,32 @@ namespace Apos_AquaProductManageApp.Interfaces
             void DisplayCages(List<Cage> cages);
             void SetPresenter(CagePresenter cagePresenter);
         }
-        public interface IStockingView { void SetPresenter(StockingPresenter presenter); void DisplayAvailableCages(List<Cage> cages); void DisplayStockings(List<FishStocking> stockings); }
+        public interface IStockingView { void SetPresenter(StockingPresenter presenter); void DisplayAvailableCages(List<Cage> cages); void DisplayStockings(List<SetQuantityView> stockings); }
+
 
         public interface IMortalityView
         {
             void SetPresenter(MortalityPresenter presenter);
-            void DisplayEligibleCages(List<Cage> cages);
-            void DisplayMortalities(List<Mortality> mortalities);
-            DateTime GetSelectedDate();
+            void DisplayMortalityData(List<SetQuantityView> cageMortalityViews);
         }
 
         public interface ITransferView
         {
-            void SetPresenter(TransferPresenter presenter);
             void DisplayTransfers(List<FishTransfer> transfers);
-            void DisplayCages(List<Cage> cages);     
-            DateTime SelectedDate { get; }
+            void DisplayCages(List<Cage> cages);
+            void SetPresenter(TransferPresenter presenter);
         }
+
+
         public interface IBalanceView
         {
             void SetPresenter(BalancePresenter presenter);
             void DisplayBalances(List<StockBalance> balances);
         }
         public interface IMortalityPivotView
-        {         
-                void SetPresenter(MortalityPivotPresenter presenter);
-                List<MortalityDimension> GetSelectedDimensions();
+        {
+            void SetPresenter(MortalityPivotPresenter presenter);
+            List<MortalityDimension> GetSelectedDimensions();
             void DisplayMortalityPivot(List<MortalityPivot> pivot);
 
         }

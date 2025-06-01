@@ -19,16 +19,14 @@ namespace Apos_AquaProductManageApp
         {
             InitializeComponent();
             Utilities.InitializeFormSizeFromConfig(this, "CageForm");
-
             Initialize();
         }
-      
+
         private void Initialize()
         {
             _cageGrid = new DataGridView { Dock = DockStyle.Top, Height = 200, AutoGenerateColumns = true };
+            _cageGrid.ReadOnly = true;
             _cageGrid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            _cageGrid.MultiSelect = false;
-
             txtName = new TextBox { PlaceholderText = "Name", Top = 210, Left = 10, Width = 200 };
             chkIsActive = new CheckBox { Text = "Is Active", Top = 210, Left = 220 };
 
@@ -64,25 +62,27 @@ namespace Apos_AquaProductManageApp
 
         private void InitializeEventHandlers()
         {
-            btnAdd.Click += (s, e) => _presenter.AddCage(txtName.Text, chkIsActive.Checked);
+            btnAdd.Click += (s, e) => ExecuteSafely(() =>
+                _presenter.AddCage(txtName.Text, chkIsActive.Checked),
+                "adding cage");
 
-            btnDelete.Click += (s, e) =>
+            btnDelete.Click += (s, e) => ExecuteSafely(() =>
             {
                 var cage = GetSelectedCage();
                 if (cage != null)
                 {
                     _presenter.DeleteCage(cage.CageId);
                 }
-            };
+            }, "deleting cage");
 
-            btnUpdate.Click += (s, e) =>
+            btnUpdate.Click += (s, e) => ExecuteSafely(() =>
             {
                 var cage = GetSelectedCage();
                 if (cage != null)
                 {
                     _presenter.UpdateCage(cage.CageId, txtName.Text, chkIsActive.Checked);
                 }
-            };
+            }, "updating cage");
 
             _cageGrid.SelectionChanged += (s, e) =>
             {
@@ -95,9 +95,22 @@ namespace Apos_AquaProductManageApp
             };
         }
 
+        private void ExecuteSafely(Action action, string operation)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Error {operation}: {ex.Message}",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
+
     }
-
-
-
 }
 

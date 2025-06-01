@@ -20,5 +20,6 @@ namespace Apos_AquaProductManageApp.Model
         [NotMapped]
         public string CageName => Cage?.Name ?? "Unknown";
 
-    }
+    }   
+
 }

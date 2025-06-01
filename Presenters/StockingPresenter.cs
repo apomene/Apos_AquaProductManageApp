@@ -21,42 +21,24 @@ namespace Apos_AquaProductManageApp.Presenters
 
         public void LoadStockingData(DateTime selectedDate)
         {
-            var availableCages = _service.GetAvailableCagesForStocking(selectedDate);
-            var existingStockings = _service.GetStockingsByDate(selectedDate);
-
-            _view.DisplayAvailableCages(availableCages);
-            _view.DisplayStockings(existingStockings);
+            var merged = _service.GetMergedCageStockings(selectedDate);
+            _view.DisplayStockings(merged);
         }
 
-        public void AddStocking(int cageId, DateTime date, int quantity)
+
+        public void AddOrUpdateStocking(int cageId, DateTime date, int quantity)
         {
-            if (quantity <= 0)
-            {
-                MessageBox.Show("Quantity must be greater than zero.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            try
-            {
-                _service.AddStocking(cageId, date, quantity);
-                LoadStockingData(date);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Failed to add stocking: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            _service.AddOrUpdateStocking(cageId, date, quantity);
         }
 
-        public void UpdateStocking(FishStocking stocking)
+        public void DeleteStocking(int cageId, DateTime date)
         {
-            _service.UpdateStocking(stocking);
+            _service.DeleteStocking(cageId, date);
         }
 
-        public void DeleteStocking(FishStocking stocking)
+        public List<SetQuantityView> GetMergedCageStockings(DateTime date)
         {
-            _service.DeleteStocking(stocking);
+            return _service.GetMergedCageStockings(date);
         }
-
     }
-
 }

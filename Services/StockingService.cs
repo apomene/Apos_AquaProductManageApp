@@ -26,46 +26,78 @@ namespace Apos_AquaProductManageApp.Services
                       .ToList();
         }
 
-        public List<Cage> GetAvailableCagesForStocking(DateTime date)
+        public List<Cage> GetAvailableCages(DateTime date)
         {
-            return _balanceService.GetEmptyCages(date);
+            return _balanceService.GetCages(date);
         }
 
-        public void AddStocking(int cageId, DateTime date, int quantity)
+        public void AddOrUpdateStocking(int cageId, DateTime date, int quantity)
         {
-            if (!_balanceService.GetEmptyCages(date).Any(c => c.CageId == cageId))
-                throw new InvalidOperationException("Cage is not empty on this date.");
+            var existing = _db.FishStockings
+                .FirstOrDefault(s => s.CageId == cageId && s.StockingDate == date);
 
-            _db.FishStockings.Add(new FishStocking { CageId = cageId, StockingDate = date, Quantity = quantity });
+            var balanceBefore = _transferService.CalculateBalance(cageId, date);
+            var existingQuantity = existing?.Quantity ?? 0;
+
+            int simulatedBalance = balanceBefore - existingQuantity + quantity;
+
+            if (simulatedBalance < 0)
+                throw new InvalidOperationException("Stocking exceeds available balance.");
+
+            if (existing != null)
+            {
+                existing.Quantity = quantity;
+                _db.FishStockings.Update(existing);
+            }
+            else
+            {
+                //// Only check if cage is empty when adding new stocking
+                //if (!_balanceService.GetEmptyCages(date).Any(c => c.CageId == cageId))
+                //    throw new InvalidOperationException("Cage is not empty on this date.");
+
+                var newStocking = new FishStocking
+                {
+                    CageId = cageId,
+                    StockingDate = date,
+                    Quantity = quantity
+                };
+                _db.FishStockings.Add(newStocking);
+            }
+
             _db.SaveChanges();
         }
 
-        public void UpdateStocking(FishStocking stocking)
+        public void DeleteStocking(int cageId, DateTime date)
         {
-            var currentStocking = _db.FishStockings.First(s => s.StockingId == stocking.StockingId);
+            var existing = _db.FishStockings
+                .FirstOrDefault(s => s.CageId == cageId && s.StockingDate == date);
 
-            var balanceBefore = _transferService.CalculateBalance(stocking.CageId, stocking.StockingDate);
+            if (existing == null)
+                return; // Nothing to delete
 
-            if (balanceBefore > currentStocking.Quantity)
+            var balanceBefore = _transferService.CalculateBalance(cageId, date);
+
+            if (balanceBefore < existing.Quantity)
                 throw new InvalidOperationException("Deleting this stocking would result in negative stock.");
-            _db.FishStockings.Update(stocking);
+
+            _db.FishStockings.Remove(existing);
             _db.SaveChanges();
         }
 
-        public void DeleteStocking(FishStocking stocking)
+        public List<SetQuantityView> GetMergedCageStockings(DateTime date)
         {
-            var currentStocking = _db.FishStockings.First(s => s.StockingId == stocking.StockingId);
+            var allCages = _db.Cages.Where(c => c.IsActive).ToList();
+            var existingStockings = _db.FishStockings.Where(s => s.StockingDate == date).ToList();
 
-            var balanceBefore = _transferService.CalculateBalance(stocking.CageId, stocking.StockingDate);
-
-            if (balanceBefore < currentStocking.Quantity)
-                throw new InvalidOperationException("Deleting this stocking would result in negative stock.");
-
-            _db.FishStockings.Remove(stocking);
-            _db.SaveChanges();
+            return allCages.Select(c => {
+                var stocking = existingStockings.FirstOrDefault(s => s.CageId == c.CageId);
+                return new SetQuantityView
+                {
+                    CageId = c.CageId,
+                    CageName = c.Name,
+                    Quantity = stocking?.Quantity ?? 0
+                };
+            }).ToList();
         }
-
     }
-
-
 }

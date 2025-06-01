@@ -11,7 +11,7 @@ namespace Apos_AquaProductManageApp.Model
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int CageId { get; set; }
 
-        public required string Name { get; set; }
+        public  string? Name { get; set; }
 
         public bool IsActive { get; set; }
     }
