@@ -2,7 +2,9 @@
 using Apos_AquaProductManageApp.Presenters;
 using Apos_AquaProductManageApp.Services;
 using Apos_AquaProductManageApp.Views;
+using System;
 using static Apos_AquaProductManageApp.Interfaces.ViewInterfaces;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Apos_AquaProductManageApp
 {
@@ -56,38 +58,10 @@ namespace Apos_AquaProductManageApp
             });
 
             gridMortality.CellEndEdit += GridMortality_CellEndEdit;
-            gridMortality.CellValidating += GridMortality_CellValidating;
 
             this.Controls.Add(gridMortality);
         }
-
-        private void GridMortality_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
-        {
-            //if (gridMortality.Columns[e.ColumnIndex].DataPropertyName == "Quantity")
-            //{
-            //    if (!int.TryParse(e.FormattedValue?.ToString(), out int newQuantity) || newQuantity < 0)
-            //    {
-            //        MessageBox.Show("Please enter a valid non-negative integer.");
-            //        e.Cancel = true;
-            //    }
-            //    else
-            //    {
-            //        var row = gridMortality.Rows[e.RowIndex].DataBoundItem as SetQuantityView;
-            //        if (row != null)
-            //        {
-            //            int balance = _transferService.CalculateBalance(row.CageId, dtPicker.Value.Date);
-            //            bool simulated = (row.Quantity-newQuantity) < balance ;
-
-            //            if (simulated)
-            //            {
-            //                MessageBox.Show("This change would exceed the cage balance.");
-            //                e.Cancel = true;
-            //            }
-            //        }
-            //    }
-            //}
-        }
-
+     
         private void GridMortality_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex >= 0)
@@ -120,7 +94,19 @@ namespace Apos_AquaProductManageApp
 
         public void DisplayMortalityData(List<SetQuantityView> cageMortalityViews)
         {
-            Utilities.BindDataSource(gridMortality, cageMortalityViews, "Cage");
+
+            if (gridMortality.IsCurrentCellInEditMode || gridMortality.IsHandleCreated)
+            {
+                gridMortality.BeginInvoke((MethodInvoker)(() =>
+                {
+                    Utilities.BindDataSource(gridMortality, cageMortalityViews, "Cage");
+                }));
+            }
+            else
+            {
+                Utilities.BindDataSource(gridMortality, cageMortalityViews, "Cage");
+            }
+          
         }
     }
 }

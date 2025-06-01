@@ -10,18 +10,32 @@ namespace Apos_AquaProductManageApp.Views
     {
         public static void BindDataSource<T>(DataGridView grid, List<T> data, params string[] columnsToHide)
         {
-            grid.DataSource = null;
-            grid.DataSource = data;
-
-            if (grid.Columns != null && columnsToHide != null)
+            void ApplyBinding()
             {
-                foreach (var columnName in columnsToHide)
+                grid.DataSource = null;
+                grid.DataSource = data;
+
+                if (grid.Columns != null && columnsToHide != null)
                 {
-                    if (!string.IsNullOrEmpty(columnName) && grid.Columns[columnName] != null)
+                    foreach (var columnName in columnsToHide)
                     {
-                        grid.Columns[columnName]!.Visible = false;
+                        if (!string.IsNullOrEmpty(columnName) && grid.Columns.Contains(columnName))
+                        {
+                            grid.Columns[columnName].Visible = false;
+                        }
                     }
                 }
+            }
+
+            // Delay if the grid is currently in edit mode to avoid re-entrant call
+            if (grid.IsCurrentCellInEditMode)
+            {
+                // Wait until the control is ready
+                grid.BeginInvoke((MethodInvoker)(() => ApplyBinding()));
+            }
+            else
+            {
+                ApplyBinding();
             }
         }
 

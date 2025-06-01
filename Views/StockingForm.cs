@@ -80,6 +80,21 @@ namespace Apos_AquaProductManageApp
 
         public void DisplayStockings(List<SetQuantityView> data)
         {
+            if (_grid.IsCurrentCellInEditMode || _grid.IsHandleCreated)
+            {
+                _grid.BeginInvoke((MethodInvoker)(() =>
+                {
+                    ApplyDisplay(data);
+                }));
+            }
+            else
+            {
+                ApplyDisplay(data);
+            }
+        }
+
+        private void ApplyDisplay(List<SetQuantityView> data)
+        {
             _grid.Columns.Clear();
             _grid.AutoGenerateColumns = false;
             _grid.ReadOnly = false;
@@ -87,7 +102,7 @@ namespace Apos_AquaProductManageApp
             _grid.AllowUserToAddRows = false;
             _grid.AllowUserToDeleteRows = false;
 
-            
+
             _grid.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "CageName",
@@ -96,7 +111,7 @@ namespace Apos_AquaProductManageApp
                 Width = 150
             });
 
-            
+
             _grid.Columns.Add(new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "Quantity",
@@ -109,12 +124,51 @@ namespace Apos_AquaProductManageApp
             {
                 DataPropertyName = "CageId",
                 Name = "CageId",
-                Visible = false 
+                Visible = false
             });
 
 
             _grid.DataSource = new BindingList<SetQuantityView>(data);
         }
+
+
+        //public void DisplayStockings(List<SetQuantityView> data)
+        //{
+        //    _grid.Columns.Clear();
+        //    _grid.AutoGenerateColumns = false;
+        //    _grid.ReadOnly = false;
+        //    _grid.EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
+        //    _grid.AllowUserToAddRows = false;
+        //    _grid.AllowUserToDeleteRows = false;
+
+            
+        //    _grid.Columns.Add(new DataGridViewTextBoxColumn
+        //    {
+        //        DataPropertyName = "CageName",
+        //        HeaderText = "Cage",
+        //        ReadOnly = true,
+        //        Width = 150
+        //    });
+
+            
+        //    _grid.Columns.Add(new DataGridViewTextBoxColumn
+        //    {
+        //        DataPropertyName = "Quantity",
+        //        HeaderText = "Quantity",
+        //        ReadOnly = false,
+        //        Width = 100
+        //    });
+
+        //    _grid.Columns.Add(new DataGridViewTextBoxColumn
+        //    {
+        //        DataPropertyName = "CageId",
+        //        Name = "CageId",
+        //        Visible = false 
+        //    });
+
+
+        //    _grid.DataSource = new BindingList<SetQuantityView>(data);
+        //}
 
 
         private void MergeCagesWithStocking()
