@@ -31,6 +31,46 @@ namespace Apos_AquaProductManageApp.Services
 
         public void TransferFish(int fromCageId, int toCageId, DateTime date, int quantity)
         {
+            ValidateTransfer(fromCageId, toCageId, date, quantity);
+
+            var fromCage = _context.Cages.First(c => c.CageId == fromCageId);
+            var toCage = _context.Cages.First(c => c.CageId == toCageId);
+
+            var fromStocking = _context.FishStockings
+                .FirstOrDefault(fs => fs.CageId == fromCageId && fs.StockingDate.Date == date.Date);
+
+            var toStocking = _context.FishStockings
+                .FirstOrDefault(fs => fs.CageId == toCageId && fs.StockingDate.Date == date.Date);
+        
+           
+            if (toStocking != null)
+            {
+                toStocking.Quantity += quantity;
+                _context.FishStockings.Update(toStocking);
+            }
+            if (fromStocking != null)
+            {
+                fromStocking!.Quantity -= quantity;
+                _context.FishStockings.Update(fromStocking);
+            }
+
+
+            var transfer = new FishTransfer
+            {
+                FromCageId = fromCageId,
+                ToCageId = toCageId,
+                TransferDate = date.Date,
+                Quantity = quantity,
+                FromCage = fromCage,
+                ToCage = toCage
+            };
+
+            _context.FishTransfers.Add(transfer);
+            _context.SaveChanges();
+        }
+
+        private void ValidateTransfer(int fromCageId, int toCageId, DateTime date, int quantity)
+        {
             if (fromCageId == toCageId)
                 throw new InvalidOperationException("Cannot transfer fish to the same cage.");
 
@@ -51,20 +91,13 @@ namespace Apos_AquaProductManageApp.Services
             if (balance < quantity)
                 throw new InvalidOperationException("Transfer would result in negative stock balance.");
 
-            var transfer = new FishTransfer
-            {
-                FromCageId = fromCageId,
-                ToCageId = toCageId,
-                TransferDate = date.Date,
-                Quantity = quantity,
-                FromCage = fromCage,
-                ToCage = toCage
-            };
+            var fromStocking = _context.FishStockings
+                .FirstOrDefault(fs => fs.CageId == fromCageId && fs.StockingDate.Date == date.Date)
+                ?? throw new InvalidOperationException($"Stocking record for From cage ID {fromCageId} on {date:d} not found.");
 
-            _context.FishTransfers.Add(transfer);
-            _context.SaveChanges();
+            if (fromStocking.Quantity < quantity)
+                throw new InvalidOperationException("Not enough fish in source cage stocking to transfer.");
         }
-
 
         public int CalculateBalance(int cageId, DateTime date)
         {
@@ -76,15 +109,15 @@ namespace Apos_AquaProductManageApp.Services
                 .Where(m => m.CageId == cageId && m.MortalityDate == date)
                 .Sum(m => (int?)m.Quantity) ?? 0;
 
-            var transfersOut = _context.FishTransfers
-                .Where(t => t.FromCageId == cageId && t.TransferDate == date)
-                .Sum(t => (int?)t.Quantity) ?? 0;
+            //var transfersOut = _context.FishTransfers
+            //    .Where(t => t.FromCageId == cageId && t.TransferDate == date)
+            //    .Sum(t => (int?)t.Quantity) ?? 0;
 
-            var transfersIn = _context.FishTransfers
-                .Where(t => t.ToCageId == cageId && t.TransferDate == date)
-                .Sum(t => (int?)t.Quantity) ?? 0;
+            //var transfersIn = _context.FishTransfers
+            //    .Where(t => t.ToCageId == cageId && t.TransferDate == date)
+            //    .Sum(t => (int?)t.Quantity) ?? 0;
 
-            return stocked - dead - transfersOut + transfersIn;
+            return stocked - dead;
         }
 
 
