@@ -259,7 +259,7 @@ namespace Apos_AquaProductManageApp
 
         public class DestinationCageEntry
         {
-            public string CageName { get; set; }
+            public string? CageName { get; set; }
             public int Quantity { get; set; }
         }
 

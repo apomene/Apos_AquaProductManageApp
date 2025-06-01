@@ -109,14 +109,6 @@ namespace Apos_AquaProductManageApp.Services
                 .Where(m => m.CageId == cageId && m.MortalityDate == date)
                 .Sum(m => (int?)m.Quantity) ?? 0;
 
-            //var transfersOut = _context.FishTransfers
-            //    .Where(t => t.FromCageId == cageId && t.TransferDate == date)
-            //    .Sum(t => (int?)t.Quantity) ?? 0;
-
-            //var transfersIn = _context.FishTransfers
-            //    .Where(t => t.ToCageId == cageId && t.TransferDate == date)
-            //    .Sum(t => (int?)t.Quantity) ?? 0;
-
             return stocked - dead;
         }
 
