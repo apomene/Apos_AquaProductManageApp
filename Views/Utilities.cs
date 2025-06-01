@@ -21,7 +21,11 @@ namespace Apos_AquaProductManageApp.Views
                     {
                         if (!string.IsNullOrEmpty(columnName) && grid.Columns.Contains(columnName))
                         {
-                            grid.Columns[columnName].Visible = false;
+                            var col = grid.Columns[columnName];
+                            if (col != null)
+                            {
+                                col.Visible = false;
+                            }
                         }
                     }
                 }

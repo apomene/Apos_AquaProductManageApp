@@ -92,6 +92,11 @@ namespace Apos_AquaProductManageApp
             _presenter.LoadMortalityData(DateTime.Today);
         }
 
+        public void RefreshCageGrid()
+        {
+            _presenter.LoadMortalityData(dtPicker.Value.Date);
+        }
+
         public void DisplayMortalityData(List<SetQuantityView> cageMortalityViews)
         {
 

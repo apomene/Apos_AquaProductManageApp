@@ -11,9 +11,8 @@ namespace Apos_AquaProductManageApp
     {
         private TabControl _tabControl = null!;
         private TabPage _fishStockingTab = null!;
+        private TabPage _mortalityTab = null!;
         private TabPage _stockBalanceTab = null!;
-        private StockingPresenter? _stockingPresenter;
-        private MortalityPresenter? _mortalityPresenter;
         private TransferPresenter? _transferPresenter;
 
         public MainWindow(IServiceProvider serviceProvider)
@@ -35,13 +34,12 @@ namespace Apos_AquaProductManageApp
                     form.Show();
                 }
 
-                DateTime selectedDate = DateTime.Today;
+               
 
                 if (_tabControl.SelectedTab == _fishStockingTab)
                 {
                     var stockingForm = _fishStockingTab.Controls.OfType<StockingForm>().FirstOrDefault();
                     stockingForm?.RefreshCageGrid();
-                    _stockingPresenter?.LoadStockingData(selectedDate);
                 }
 
                 if (_tabControl.SelectedTab == _stockBalanceTab)
@@ -52,7 +50,8 @@ namespace Apos_AquaProductManageApp
 
                 if (_tabControl.SelectedTab?.Text == "Fish Mortalities")
                 {
-                    _mortalityPresenter?.LoadMortalityData(selectedDate);
+                    var mortalityForm = _mortalityTab.Controls.OfType<MortalityForm>().FirstOrDefault();
+                    mortalityForm?.RefreshCageGrid();
                 }
 
                 if (_tabControl.SelectedTab?.Text == "Fish Transfers")
@@ -73,17 +72,16 @@ namespace Apos_AquaProductManageApp
                         "Fish Stocking",
                         serviceProvider,
                         () => new StockingForm(serviceProvider.GetRequiredService<TransferService>()),
-                        form => _stockingPresenter = new StockingPresenter(
+                        form =>   new StockingPresenter(
                             (IStockingView)form,
                             serviceProvider.GetRequiredService<StockingService>())),
                     () => AddCustomTab(() => new MortalityForm(), "Fish Mortalities", view =>
                     {
                         var mortalityService = serviceProvider.GetRequiredService<MortalityService>();
                         var presenter = new MortalityPresenter((IMortalityView)view, mortalityService);
-                        _mortalityPresenter = presenter;
                         return presenter;
                     }),
-                    () => AddCustomTab(() => new TransferForm(serviceProvider.GetRequiredService<TransferService>()), "Fish Transfers", view =>
+                    () => _mortalityTab = AddCustomTab(() => new TransferForm(serviceProvider.GetRequiredService<TransferService>()), "Fish Transfers", view =>
                     {
                         var transferService = serviceProvider.GetRequiredService<TransferService>();
                         var presenter = new TransferPresenter((ITransferView)view, transferService);
@@ -161,8 +159,8 @@ namespace Apos_AquaProductManageApp
             return tabPage;
         }
 
-        private void AddCustomTab<TForm>(Func<TForm> formFactory, string title, Func<TForm, object> presenterFactory)
-            where TForm : Form
+        private TabPage AddCustomTab<TForm>(Func<TForm> formFactory, string title, Func<TForm, object> presenterFactory)
+      where TForm : Form
         {
             var form = formFactory();
             form.TopLevel = false;
@@ -171,8 +169,9 @@ namespace Apos_AquaProductManageApp
 
             var presenter = presenterFactory(form);
 
-            ShowFormInTab(form, title);
+            return ShowFormInTab(form, title);
         }
+
 
         private TabPage AddTab<TForm, TView, TPresenter>(string title, IServiceProvider services)
             where TForm : Form, TView, new()

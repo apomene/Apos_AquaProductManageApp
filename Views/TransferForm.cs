@@ -107,7 +107,13 @@ namespace Apos_AquaProductManageApp
         {
             if (gridDestinations.Columns[e.ColumnIndex].Name == "Quantity")
             {
-                var entry = (DestinationCageEntry)gridDestinations.Rows[e.RowIndex].DataBoundItem;
+                var row = gridDestinations.Rows[e.RowIndex];
+                var entry = row.DataBoundItem as DestinationCageEntry;
+
+                if (entry == null)
+                {
+                    return;
+                }
 
                 if (entry.Quantity < 0)
                 {
@@ -115,6 +121,7 @@ namespace Apos_AquaProductManageApp
                     entry.Quantity = 0;
                     gridDestinations.Refresh();
                 }
+
             }
         }
 
@@ -164,6 +171,10 @@ namespace Apos_AquaProductManageApp
             {
                 MessageBox.Show($"Transfer failed: {ex.Message}");
             }
+            finally
+            {
+                _presenter.LoadTransfers(dtPicker.Value.Date);               
+            }
         }
 
 
@@ -192,10 +203,19 @@ namespace Apos_AquaProductManageApp
             gridTransfers.DataSource = transfers;
 
             if (gridTransfers.Columns.Contains("FromCage"))
-                gridTransfers.Columns["FromCage"].Visible = false;
+            {
+                var fromCageColumn = gridTransfers.Columns["FromCage"];
+                if (fromCageColumn != null)
+                    fromCageColumn.Visible = false;
+            }
 
             if (gridTransfers.Columns.Contains("ToCage"))
-                gridTransfers.Columns["ToCage"].Visible = false;
+            {
+                var toCageColumn = gridTransfers.Columns["ToCage"];
+                if (toCageColumn != null)
+                    toCageColumn.Visible = false;
+            }
+
 
         }
 
@@ -222,9 +242,18 @@ namespace Apos_AquaProductManageApp
             gridDestinations.DataSource = destinationOptions;
             gridDestinations.ReadOnly = false;
 
-            // Now these are editable since Quantity has a setter
-            gridDestinations.Columns["Quantity"].ReadOnly = false;
-            gridDestinations.Columns["CageName"].ReadOnly = true;
+            var quantityColumn = gridDestinations.Columns["Quantity"];
+            if (quantityColumn != null)
+            {
+                quantityColumn.ReadOnly = false;
+            }
+
+            var cageNameColumn = gridDestinations.Columns["CageName"];
+            if (cageNameColumn != null)
+            {
+                cageNameColumn.ReadOnly = true;
+            }
+
         }
 
 
