@@ -1,10 +1,7 @@
 ﻿using Apos_AquaProductManageApp.Model;
 using Apos_AquaProductManageApp.Presenters;
-using Apos_AquaProductManageApp.Services;
 using Apos_AquaProductManageApp.Views;
-using System;
 using static Apos_AquaProductManageApp.Interfaces.ViewInterfaces;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Apos_AquaProductManageApp
 {

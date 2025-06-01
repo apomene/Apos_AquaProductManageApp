@@ -131,46 +131,6 @@ namespace Apos_AquaProductManageApp
             _grid.DataSource = new BindingList<SetQuantityView>(data);
         }
 
-
-        //public void DisplayStockings(List<SetQuantityView> data)
-        //{
-        //    _grid.Columns.Clear();
-        //    _grid.AutoGenerateColumns = false;
-        //    _grid.ReadOnly = false;
-        //    _grid.EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
-        //    _grid.AllowUserToAddRows = false;
-        //    _grid.AllowUserToDeleteRows = false;
-
-            
-        //    _grid.Columns.Add(new DataGridViewTextBoxColumn
-        //    {
-        //        DataPropertyName = "CageName",
-        //        HeaderText = "Cage",
-        //        ReadOnly = true,
-        //        Width = 150
-        //    });
-
-            
-        //    _grid.Columns.Add(new DataGridViewTextBoxColumn
-        //    {
-        //        DataPropertyName = "Quantity",
-        //        HeaderText = "Quantity",
-        //        ReadOnly = false,
-        //        Width = 100
-        //    });
-
-        //    _grid.Columns.Add(new DataGridViewTextBoxColumn
-        //    {
-        //        DataPropertyName = "CageId",
-        //        Name = "CageId",
-        //        Visible = false 
-        //    });
-
-
-        //    _grid.DataSource = new BindingList<SetQuantityView>(data);
-        //}
-
-
         private void MergeCagesWithStocking()
         {
             if (_allCages == null || _stockings == null) return;
@@ -193,49 +153,66 @@ namespace Apos_AquaProductManageApp
 
         private void Grid_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
         {
-            if (_grid.Columns[e.ColumnIndex].Name == "Quantity")
+            try
             {
-                if (int.TryParse(e.FormattedValue.ToString(), out int newQuantity))
+                if (_grid.Columns[e.ColumnIndex].Name == "Quantity")
                 {
-                    var row = _grid.Rows[e.RowIndex];
-                    var data = (SetQuantityView)row.DataBoundItem;
-
-                    int currentQty = data.Quantity;
-                    int simulatedBalance = _transferService.CalculateBalance(data.CageId, _dtPicker.Value.Date)
-                                              - currentQty + newQuantity;
-
-                    if (simulatedBalance < 0)
+                    if (int.TryParse(e.FormattedValue.ToString(), out int newQuantity))
                     {
-                        MessageBox.Show("This update would result in a negative stock balance.", "Invalid Operation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        e.Cancel = true;
+                        var row = _grid.Rows[e.RowIndex];
+                        var data = (SetQuantityView)row.DataBoundItem;
+
+                        int currentQty = data.Quantity;
+                        int simulatedBalance = _transferService.CalculateBalance(data.CageId, _dtPicker.Value.Date)
+                                                  - currentQty + newQuantity;
+
+                        if (simulatedBalance < 0)
+                        {
+                            MessageBox.Show("This update would result in a negative stock balance.", "Invalid Operation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            e.Cancel = true;
+                        }
                     }
-                }
+                }               
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Validation failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                e.Cancel = true;
             }
         }
 
         private void gridStocked_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.RowIndex >= 0)
+            try
             {
-                var updated = _grid.Rows[e.RowIndex].DataBoundItem as SetQuantityView;
-
-                if (updated != null)
+                if (e.RowIndex >= 0)
                 {
-                    try
+                    var updated = _grid.Rows[e.RowIndex].DataBoundItem as SetQuantityView;
+
+                    if (updated != null)
                     {
                         _presenter.AddOrUpdateStocking(updated.CageId, _dtPicker.Value.Date, updated.Quantity);
                     }
+                }
+                if (e.RowIndex >= 0)
+                {
+                    var updated = _grid.Rows[e.RowIndex].DataBoundItem as SetQuantityView;
 
-                    catch (Exception ex)
+                    if (updated != null)
                     {
-                        MessageBox.Show($"Update failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                        _presenter.AddOrUpdateStocking(updated.CageId, _dtPicker.Value.Date, updated.Quantity);
                     }
-                    finally
-                    {
-                        _presenter.LoadStockingData(_dtPicker.Value.Date);
-                    }
-                }                
+                }
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Update failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                _presenter.LoadStockingData(_dtPicker.Value.Date);
+            }           
         }
     
         public void RefreshCageGrid()

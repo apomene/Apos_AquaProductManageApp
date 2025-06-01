@@ -75,13 +75,13 @@ namespace Apos_AquaProductManageApp
                         form =>   new StockingPresenter(
                             (IStockingView)form,
                             serviceProvider.GetRequiredService<StockingService>())),
-                    () => AddCustomTab(() => new MortalityForm(), "Fish Mortalities", view =>
+                    () => _mortalityTab = AddCustomTab(() => new MortalityForm(), "Fish Mortalities", view =>
                     {
                         var mortalityService = serviceProvider.GetRequiredService<MortalityService>();
                         var presenter = new MortalityPresenter((IMortalityView)view, mortalityService);
                         return presenter;
                     }),
-                    () => _mortalityTab = AddCustomTab(() => new TransferForm(serviceProvider.GetRequiredService<TransferService>()), "Fish Transfers", view =>
+                    () =>  AddCustomTab(() => new TransferForm(serviceProvider.GetRequiredService<TransferService>()), "Fish Transfers", view =>
                     {
                         var transferService = serviceProvider.GetRequiredService<TransferService>();
                         var presenter = new TransferPresenter((ITransferView)view, transferService);
