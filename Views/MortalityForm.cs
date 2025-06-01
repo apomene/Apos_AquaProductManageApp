@@ -11,12 +11,10 @@ namespace Apos_AquaProductManageApp
         private MortalityPresenter _presenter = null!;
         private DataGridView gridMortality = null!;
         private DateTimePicker dtPicker = null!;
-        private readonly TransferService _transferService;
 
-        public MortalityForm(TransferService transferService)
+        public MortalityForm()
         {
             InitializeComponent();
-            _transferService = transferService;
             Utilities.InitializeFormSizeFromConfig(this, "MortalityForm");
             Initialize();
         }
